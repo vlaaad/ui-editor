@@ -1,0 +1,11 @@
+{
+    name: loader,
+    fillParent: true,
+    widget: {
+        type: progressBar,
+        name: progress,
+        width: 200,
+        height: 20,
+        style: default
+    }
+}

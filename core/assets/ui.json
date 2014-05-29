@@ -1,0 +1,23 @@
+{
+    com.badlogic.gdx.graphics.Color: {
+        textDefault: {hex: ccccccff},
+        textButton: {hex: ccccccff},
+        textDisabled: {hex: 666666ff}
+    },
+    com.badlogic.gdx.graphics.g2d.BitmapFont: {
+        default: {file: ubuntu-light-16.fnt}
+    },
+    com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
+        default: {font: default, fontColor: textDefault}
+    },
+    com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
+        default: {
+            font: default,
+            fontColor: textButton,
+            disabledFontColor: textDisabled,
+            up: button-up,
+            over: button-over,
+            down: button-down
+        }
+    }
+}

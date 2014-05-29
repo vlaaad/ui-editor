@@ -1,0 +1,48 @@
+{
+    name: ui,
+    fillParent: true,
+    fill: true,
+    minWidth: 500,
+    minHeight: 500,
+    widget: {
+        type: table,
+        name: main,
+        align: top,
+        cells: [
+            [
+                {
+                    widget: {
+                        type: textButton,
+                        name: open,
+                        style: default,
+                        text: "You finally did it!"
+                    },
+                    height: 20,
+                    expandX: true,
+                    width: 100,
+                    colspan: 2
+                }
+            ],
+            [
+                {
+                    widget: {
+                       type: container,
+                       name: workspace
+                    },
+                    expandX: true,
+                    expandY: true
+                },
+                {
+                    widget: {
+                        type: container,
+                        name: tree
+                    },
+                    width: 200,
+                    expandY: true,
+                    fillX: true,
+                    fillY: true
+                }
+            ]
+        ]
+    }
+}

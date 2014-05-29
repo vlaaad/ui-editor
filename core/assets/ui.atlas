@@ -1,0 +1,40 @@
+
+ui.png
+size: 273,288
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+button-down
+  rotate: false
+  xy: 2, 17
+  size: 13, 13
+  split: 6, 6, 6, 6
+  pad: 4, 4, 4, 4
+  orig: 13, 13
+  offset: 0, 0
+  index: -1
+button-over
+  rotate: false
+  xy: 260, 275
+  size: 13, 13
+  split: 6, 6, 6, 6
+  pad: 4, 4, 4, 4
+  orig: 13, 13
+  offset: 0, 0
+  index: -1
+button-up
+  rotate: false
+  xy: 2, 2
+  size: 13, 13
+  split: 6, 6, 6, 6
+  pad: 4, 4, 4, 4
+  orig: 13, 13
+  offset: 0, 0
+  index: -1
+ubuntu-light-16
+  rotate: false
+  xy: 2, 32
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: -1
