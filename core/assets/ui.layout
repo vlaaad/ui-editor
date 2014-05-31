@@ -1,9 +1,9 @@
 {
     name: ui,
+    type: container,
     fillParent: true,
-    fill: true,
-    minWidth: 500,
-    minHeight: 500,
+    fillX: true,
+    fillY: true,
     widget: {
         type: table,
         name: main,
@@ -17,7 +17,7 @@
                         style: default,
                         text: "You finally did it!"
                     },
-                    height: 20,
+                    minHeight: 20,
                     expandX: true,
                     width: 100,
                     colspan: 2
@@ -35,9 +35,11 @@
                 {
                     widget: {
                         type: container,
-                        name: tree
+                        name: tree,
+                        fillX: true,
+                        fillY: true
                     },
-                    width: 200,
+                    minWidth: 200,
                     expandY: true,
                     fillX: true,
                     fillY: true

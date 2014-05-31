@@ -1,12 +1,12 @@
 
 ui.png
-size: 273,288
+size: 281,296
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
 button-down
   rotate: false
-  xy: 2, 17
+  xy: 2, 9
   size: 13, 13
   split: 6, 6, 6, 6
   pad: 4, 4, 4, 4
@@ -15,7 +15,7 @@ button-down
   index: -1
 button-over
   rotate: false
-  xy: 260, 275
+  xy: 18, 25
   size: 13, 13
   split: 6, 6, 6, 6
   pad: 4, 4, 4, 4
@@ -24,16 +24,57 @@ button-over
   index: -1
 button-up
   rotate: false
-  xy: 2, 2
+  xy: 260, 267
   size: 13, 13
   split: 6, 6, 6, 6
   pad: 4, 4, 4, 4
   orig: 13, 13
   offset: 0, 0
   index: -1
+minus
+  rotate: false
+  xy: 2, 24
+  size: 14, 14
+  orig: 14, 14
+  offset: 0, 0
+  index: -1
+plus
+  rotate: false
+  xy: 260, 282
+  size: 14, 14
+  orig: 14, 14
+  offset: 0, 0
+  index: -1
+tree-background
+  rotate: false
+  xy: 276, 291
+  size: 5, 5
+  split: 2, 2, 2, 2
+  pad: 0, 0, 0, 0
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+tree-over
+  rotate: false
+  xy: 2, 2
+  size: 5, 5
+  split: 2, 2, 2, 2
+  pad: 0, 0, 0, 0
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+tree-selection
+  rotate: false
+  xy: 33, 33
+  size: 5, 5
+  split: 2, 2, 2, 2
+  pad: 0, 0, 0, 0
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
 ubuntu-light-16
   rotate: false
-  xy: 2, 32
+  xy: 2, 40
   size: 256, 256
   orig: 256, 256
   offset: 0, 0

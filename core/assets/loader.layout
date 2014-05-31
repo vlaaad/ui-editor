@@ -1,5 +1,6 @@
 {
     name: loader,
+    type: container,
     fillParent: true,
     widget: {
         type: progressBar,

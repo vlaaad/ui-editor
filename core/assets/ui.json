@@ -19,5 +19,14 @@
             over: button-over,
             down: button-down
         }
+    },
+    com.badlogic.gdx.scenes.scene2d.ui.Tree$TreeStyle: {
+        default: {
+            plus: plus,
+            minus: minus,
+            over: tree-over,
+            selection: tree-selection,
+            background: tree-background
+        }
     }
 }

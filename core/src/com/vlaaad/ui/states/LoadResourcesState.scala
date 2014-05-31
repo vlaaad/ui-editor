@@ -18,7 +18,7 @@ class LoadResourcesState(val assets: AssetManager, val callback: () => Unit) ext
 
   protected override def onEntered() {
     val layout: UiLayout = new UiLayout(Gdx.files.internal("loader.layout"))
-    stage.addActor(layout)
+    stage.addActor(layout.getActor)
     progress = layout.get(classOf[ProgressBar], "progress")
 
     val resolver = new InternalFileHandleResolver
