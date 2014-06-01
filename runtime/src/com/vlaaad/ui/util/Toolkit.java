@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.Layout;
+import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.tablelayout.Cell;
@@ -341,6 +342,12 @@ public class Toolkit {
             }
         });
 
+        applier("background", Table.class, Drawable.class, new Applier<Table, Drawable>() {
+            @Override public void apply(Table o, Drawable v) {
+                o.setBackground(v);
+            }
+        });
+
         instantiator("label", Label.class, new Instantiator<Label>() {
             {
                 require("text", String.class);
@@ -364,18 +371,22 @@ public class Toolkit {
         instantiator("container", Container.class, new Instantiator<Container>() {
 
             @Override public Container newInstance(Resources resources) {
-                Actor widget = value.has("widget") ? instantiate(value.get("widget")) : new Actor();
-                return new Container(widget == null ? new Actor() : widget);
+//                Actor widget = ;
+                return new Container(value.has("widget") ? (Actor) instantiate(value.get("widget")) : null);
             }
         });
         instantiator("table", Table.class, new Instantiator<Table>() {
             @Override public Table newInstance(Resources resources) {
                 Table table = new Table(skin);
+                if (!value.has("cells"))
+                    return table;
                 for (JsonValue row : value.get("cells")) {
-                    for (JsonValue cell : row) {
-                        Actor a = instantiate(cell.get("widget"));
-                        Cell c = table.add(a);
-                        inject(c, cell);
+                    for (JsonValue cellValue : row) {
+                        Actor actor = instantiate(cellValue.get("widget"));
+                        Cell cell = table.add(actor);
+                        System.out.println("INJECT CELL OF " + actor);
+                        inject(cell, cellValue);
+                        System.out.println("ended injecting");
                     }
                     table.row();
                 }
@@ -430,6 +441,7 @@ public class Toolkit {
                 continue;
             Object value = extract(applier.valueClass, v, s);
             if (injected != null) injected.put(v.name(), value);
+            System.out.println("injected " + v.name() + "=" + value);
             applier.apply(o, value);
         }
     }
@@ -460,6 +472,8 @@ public class Toolkit {
             return Color.valueOf(value.asString());
         } else if (valueClass == Drawable.class) {
             return skin.getDrawable(value.asString());
+        } else if (valueClass == TiledDrawable.class) {
+            return skin.getTiledDrawable(value.asString());
         } else if (value.isString() && skin.has(value.asString(), valueClass)) {
             return skin.get(value.asString(), valueClass);
         } else if (valueClass.isEnum() && value.isString()) {
@@ -525,6 +539,11 @@ public class Toolkit {
 
     public static boolean hasInstantiator(Class type) {
         return instantiators.containsKey(type);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> Instantiator<T> instantiator(Class<T> type) {
+        return instantiators.get(type);
     }
 
     public static <T> void instantiator(String tag, Class<T> objectType, Instantiator<T> instantiator) {

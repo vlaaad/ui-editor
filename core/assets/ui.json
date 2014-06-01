@@ -2,13 +2,15 @@
     com.badlogic.gdx.graphics.Color: {
         textDefault: {hex: ccccccff},
         textButton: {hex: ccccccff},
-        textDisabled: {hex: 666666ff}
+        textDisabled: {hex: 666666ff},
+        textHint: {hex: 777777ff}
     },
     com.badlogic.gdx.graphics.g2d.BitmapFont: {
         default: {file: ubuntu-light-16.fnt}
     },
     com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
-        default: {font: default, fontColor: textDefault}
+        default: {font: default, fontColor: textDefault},
+        hint: {font: default, fontColor: textHint}
     },
     com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
         default: {

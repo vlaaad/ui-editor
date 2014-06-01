@@ -1,50 +1,53 @@
 {
-    name: ui,
-    type: container,
+    type: table,
+    name: root,
+    align: top,
+    minWidth: 300,
+    minHeight: 300,
     fillParent: true,
-    fillX: true,
-    fillY: true,
-    widget: {
-        type: table,
-        name: main,
-        align: top,
-        cells: [
-            [
-                {
-                    widget: {
-                        type: textButton,
-                        name: open,
-                        style: default,
-                        text: "You finally did it!"
-                    },
-                    minHeight: 20,
-                    expandX: true,
-                    width: 100,
-                    colspan: 2
-                }
-            ],
-            [
-                {
-                    widget: {
-                       type: container,
-                       name: workspace
-                    },
-                    expandX: true,
-                    expandY: true
+    cells: [
+        [
+            {
+                widget: {
+                    type: textButton,
+                    name: open,
+                    style: default,
+                    text: "You finally did it!"
                 },
-                {
-                    widget: {
-                        type: container,
-                        name: tree,
-                        fillX: true,
-                        fillY: true
-                    },
-                    minWidth: 200,
-                    expandY: true,
+                minHeight: 20,
+                minWidth: 100,
+                expandX: true,
+                width: 100,
+                colspan: 2
+            }
+        ],
+        [
+            {
+                widget: {
+                   type: container,
+                   name: workspace,
+                   background: workspace-background,
+                   fillX: true,
+                   fillY: true
+                },
+                expandX: true,
+                expandY: true,
+                fillX: true,
+                fillY: true
+            },
+            {
+                widget: {
+                    type: container,
+                    name: tree,
                     fillX: true,
                     fillY: true
-                }
-            ]
+                },
+                minWidth: 200,
+                expandY: true,
+                fillX: true,
+                fillY: true
+            }
         ]
-    }
+    ]
+
 }

@@ -7,6 +7,8 @@ import com.vlaaad.ui.UiEditor;
 public class DesktopLauncher {
 	public static void main (String[] arg) throws Exception {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+        config.width = 960;
+        config.height = 540;
 		new LwjglApplication(new UiEditor(), config);
 	}
 }
