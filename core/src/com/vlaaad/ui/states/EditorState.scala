@@ -13,6 +13,8 @@ import javax.swing.filechooser.FileFilter
 import com.badlogic.gdx.files.FileHandle
 import collection.convert.wrapAll._
 import com.badlogic.gdx.Gdx
+import com.vlaaad.ui.models.ActorModel
+import com.vlaaad.ui.util.Toolkit
 
 
 /** Created 29.05.14 by vlaaad */
@@ -64,39 +66,31 @@ class EditorState(val assets: AssetManager) extends AppState {
 
   def updateTree(actor: Actor): Unit = {
     val t = new Tree(skin)
-//    val model = buildModel(actor)
+    val model = buildModel(actor).get
     tree.setWidget(t)
-    actor match {
-      case g: Group => g.getChildren.foreach(child => {
-        val node = constructNode(child)
-        t.add(node)
-      })
-      case v => t.add(constructNode(v))
-    }
+    t.add(createTree(model))
     t.expandAll()
   }
 
-  def constructNode(a: Actor): Tree.Node = {
-    val node = new Tree.Node(new Label(a.toString, skin))
-    node.setObject(a)
-    a match {
-      case g: Group =>
-        g.getChildren.foreach(child => node.add(constructNode(child)))
-        node
-      case _ => node
+  def buildModel(actor: Actor): Option[ActorModel] = {
+    if (Toolkit.hasInstantiator(actor.getClass)) {
+      val model = new ActorModel(actor)
+      actor match {
+        case g: Group =>
+          g.getChildren.map(buildModel).filter(_.isDefined).foreach(model.children += _.get)
+        case _ =>
+      }
+      Some(model)
+    } else {
+      None
     }
   }
 
-  //  def initTree(tree: Tree, actor: Actor): Tree.Node = {
-  //    actor match {
-  //      case g: Group =>
-  //        tree.add(new Tree.Node(t))
-  //        g.getChildren.foreach(initTree(t, _))
-  //      case v =>
-  //        val node = new Tree.Node(new Label(v.toString, skin))
-  //        node
-  //    }
-  //  }
+  def createTree(model: ActorModel): Tree.Node = {
+    val node = new Tree.Node(new Label(model.actor.toString + ":" + model.actor.getClass.getSimpleName, skin))
+    model.children.foreach(v => node.add(createTree(v)))
+    node
+  }
 
   def debug(actor: Actor): Unit = {
     actor match {

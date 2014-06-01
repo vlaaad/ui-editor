@@ -507,6 +507,10 @@ public class Toolkit {
             throw new IllegalStateException("Key \"" + key + "\" already registered!");
     }
 
+    public static boolean hasInstantiator(Class type) {
+        return instantiators.containsKey(type);
+    }
+
     public static <T> void instantiator(String tag, Class<T> objectType, Instantiator<T> instantiator) {
         instantiators.put(objectType, instantiator);
         tags.put(tag, objectType);
