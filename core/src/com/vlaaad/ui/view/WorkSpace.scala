@@ -19,7 +19,12 @@ class WorkSpace extends WidgetGroup {
 
   override def draw(batch: Batch, parentAlpha: Float): Unit = {
     background.foreach(_.draw(batch, getX, getY, getWidth, getHeight))
-    super.draw(batch, parentAlpha)
+    batch.flush()
+    if (clipBegin()) {
+      super.draw(batch, parentAlpha)
+      batch.flush()
+      clipEnd()
+    }
   }
 
   def setWidget(widget: Actor) = {

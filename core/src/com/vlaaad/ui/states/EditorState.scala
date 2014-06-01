@@ -75,12 +75,11 @@ class EditorState(val assets: AssetManager) extends AppState {
     val params = new ObjectMap[Object, ObjectMap[String, Object]]()
     layout = new UiLayout(file, skin, params)
     workspace.setWidget(layout.getActor)
-
-    tree = new Tree(skin)
     model = buildModel(layout.getActor)
-    treeContainer.setWidget(tree)
+    tree = new Tree(skin)
     tree.add(createTree(model))
     tree.expandAll()
+    treeContainer.setWidget(tree)
   }
 
   def buildModel(actor: Actor): ActorModel = {
