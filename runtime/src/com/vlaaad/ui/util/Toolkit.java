@@ -375,7 +375,7 @@ public class Toolkit {
                     for (JsonValue cell : row) {
                         Actor a = instantiate(cell.get("widget"));
                         Cell c = table.add(a);
-                        inject(c, cell, skin);
+                        inject(c, cell);
                     }
                     table.row();
                 }
@@ -400,19 +400,27 @@ public class Toolkit {
         });
     }
 
-    private static void inject(Object o, JsonValue v, Skin s) {
+    static void inject(ObjectMap<Object, ObjectMap<String, Object>> fill, Object o, JsonValue v, Skin s) {
         Class type = o.getClass();
+        ObjectMap<String, Object> injected = null;
+        if (fill != null) {
+            injected = fill.get(o);
+            if (injected == null) {
+                injected = new ObjectMap<String, Object>();
+                fill.put(o, injected);
+            }
+        }
         while (type != null) {
-            injectAs(type, o, v, s);
+            injectAs(injected, type, o, v, s);
             for (Class inf : type.getInterfaces()) {
-                injectAs(inf, o, v, s);
+                injectAs(injected, inf, o, v, s);
             }
             type = type.getSuperclass();
         }
     }
 
     @SuppressWarnings("unchecked")
-    private static void injectAs(Class type, Object o, JsonValue val, Skin s) {
+    private static void injectAs(ObjectMap<String, Object> injected, Class type, Object o, JsonValue val, Skin s) {
         ObjectMap<String, Applier> typeAppliers = appliers.get(type);
         if (typeAppliers == null)
             return;
@@ -420,9 +428,9 @@ public class Toolkit {
             Applier applier = typeAppliers.get(v.name());
             if (applier == null)
                 continue;
-            System.out.println("apply " + v.name());
-            applier.apply(o, extract(applier.valueClass, v, s));
-
+            Object value = extract(applier.valueClass, v, s);
+            if (injected != null) injected.put(v.name(), value);
+            applier.apply(o, value);
         }
     }
 
@@ -475,7 +483,7 @@ public class Toolkit {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T instantiate(JsonValue v, Skin s) {
+    public static <T> T instantiate(JsonValue v, Skin s, ObjectMap<Object, ObjectMap<String, Object>> extractedParams) {
         String tag = v.getString("type");
         Class<?> type = tags.get(tag);
         Instantiator instantiator = instantiators.get(type);
@@ -485,14 +493,22 @@ public class Toolkit {
 
         JsonValue prevValue = instantiator.value;
         Skin prevSkin = instantiator.skin;
+        ObjectMap<Object, ObjectMap<String, Object>> prevParams = instantiator.params;
         instantiator.value = v;
         instantiator.skin = s;
+        instantiator.params = extractedParams;
         Resources resources = extractResources(instantiator.requirements, v, s);
         Object o = instantiator.newInstance(resources);
-        inject(o, v, s);
+        inject(extractedParams, o, v, s);
         instantiator.value = prevValue;
         instantiator.skin = prevSkin;
+        instantiator.params = prevParams;
         return (T) o;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T instantiate(JsonValue v, Skin s) {
+        return instantiate(v, s, null);
     }
 
     public static <A, T> void applier(String key, Class<A> objectType, Class<T> valueType, Applier<A, T> applier) {

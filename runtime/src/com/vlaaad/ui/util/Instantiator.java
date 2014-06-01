@@ -11,6 +11,7 @@ public abstract class Instantiator<T> {
     final ObjectMap<String, Class> requirements = new ObjectMap<String, Class>();
     JsonValue value;
     Skin skin;
+    ObjectMap<Object, ObjectMap<String, Object>> params;
 
     protected void require(String key, Class type) {
         requirements.put(key, type);
@@ -19,6 +20,11 @@ public abstract class Instantiator<T> {
     public abstract T newInstance(Resources resources);
 
     protected T instantiate(JsonValue value) {
-        return Toolkit.instantiate(value, skin);
+        return Toolkit.instantiate(value, skin, params);
+    }
+
+    protected <A> A inject(A a, JsonValue value) {
+        Toolkit.inject(params, a, value, skin);
+        return a;
     }
 }

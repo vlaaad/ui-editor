@@ -26,6 +26,7 @@ public class UiLayoutLoader extends AsynchronousAssetLoader<UiLayout, UiLayoutLo
         return new UiLayout(file, manager.get(file.nameWithoutExtension() + ".json", Skin.class));
     }
 
+    @SuppressWarnings("unchecked")
     @Override public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, UiLayoutParameter parameter) {
         return Array.with(new AssetDescriptor(file.sibling(file.nameWithoutExtension() + ".json"), Skin.class));
     }

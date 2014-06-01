@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.vlaaad.ui.util.Toolkit;
 
 import java.util.Arrays;
@@ -18,6 +19,7 @@ public class UiLayout {
 
     private final FileHandle file;
     public final Skin skin;
+    public final ObjectMap<Object, ObjectMap<String, Object>> params;
     private Actor actor;
 
     public UiLayout(FileHandle file) {
@@ -25,15 +27,19 @@ public class UiLayout {
     }
 
     public UiLayout(FileHandle file, Skin skin) {
+        this(file, skin, null);
+    }
+
+    public UiLayout(FileHandle file, Skin skin, ObjectMap<Object, ObjectMap<String, Object>> params) {
         this.file = file;
         this.skin = skin;
+        this.params = params;
         load();
     }
 
     private void load() {
         JsonValue value = new JsonReader().parse(file);
-//        System.out.println(value);
-        actor = Toolkit.instantiate(value, skin);
+        actor = Toolkit.instantiate(value, skin, params);
     }
 
     public Actor getActor() {

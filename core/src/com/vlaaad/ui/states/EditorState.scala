@@ -15,6 +15,7 @@ import collection.convert.wrapAll._
 import com.badlogic.gdx.Gdx
 import com.vlaaad.ui.models.ActorModel
 import com.vlaaad.ui.util.Toolkit
+import com.badlogic.gdx.utils.ObjectMap
 
 
 /** Created 29.05.14 by vlaaad */
@@ -56,7 +57,9 @@ class EditorState(val assets: AssetManager) extends AppState {
   }
 
   def open(file: FileHandle) = {
-    val layout = new UiLayout(file)
+    val params = new ObjectMap[Object, ObjectMap[String, Object]]()
+    val layout = new UiLayout(file, skin, params)
+    println("filled params: " + params)
     workspace.setWidget(layout.getActor)
     workspace.invalidateHierarchy()
     main.layout()
