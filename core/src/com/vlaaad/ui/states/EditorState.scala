@@ -4,7 +4,7 @@ import com.vlaaad.ui.app.AppState
 import com.badlogic.gdx.assets.AssetManager
 import com.vlaaad.ui.UiLayout
 import com.badlogic.gdx.scenes.scene2d.ui._
-import com.badlogic.gdx.scenes.scene2d.utils.{Layout, TiledDrawable, ChangeListener}
+import com.badlogic.gdx.scenes.scene2d.utils.{TiledDrawable, ChangeListener}
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent
 import com.badlogic.gdx.scenes.scene2d.{Group, Actor}
 import javax.swing.JFileChooser
@@ -20,6 +20,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.graphics.{Color, GL20}
 import com.vlaaad.ui.view.WorkSpace
+import com.esotericsoftware.tablelayout.Cell
 
 
 /** Created 29.05.14 by vlaaad */
@@ -75,30 +76,55 @@ class EditorState(val assets: AssetManager) extends AppState {
     val params = new ObjectMap[Object, ObjectMap[String, Object]]()
     layout = new UiLayout(file, skin, params)
     workspace.setWidget(layout.getActor)
-    model = buildModel(layout.getActor)
+    model = buildModel(layout.getActor, params)
     tree = new Tree(skin)
     tree.add(createTree(model))
     tree.expandAll()
+    tree.getSelection.setMultiple(false)
+    tree.addListener(new ChangeListener {
+      override def changed(event: ChangeEvent, actor: Actor): Unit = {
+        println(s"chang event, selected = ${Option(tree.getSelection.first).map(_.getObject)}")
+        Option(tree.getSelection.first).map(_.getObject) match {
+          case Some(v) => v
+          case None =>
+        }
+      }
+    })
     treeContainer.setWidget(tree)
   }
 
-  def buildModel(actor: Actor): ActorModel = {
-    actor match {
-      case label: Label => new Leaf(label)
-      case tb: TextButton => new Leaf(tb)
-      case c: Container => new Wrapper(c, if (c.getWidget == null) None else Some(buildModel(c.getWidget)))
-      case t: Group =>
+  def buildModel(obj: Object, params: ObjectMap[Object, ObjectMap[String, Object]]): ActorModel = {
+    val data = params.get(obj)
+    obj match {
+      case label: Label =>
+        new Leaf(label, data)
+      case tb: Button =>
+        new Leaf(tb, data)
+      case c: Container =>
+        new Wrapper(c, data, if (c.getWidget == null) None else Some(buildModel(c.getWidget, params)))
+      case cell: Cell[AnyRef] =>
+        new Wrapper(cell, data, Option(cell.getWidget).map(v => buildModel(v, params)))
+      case table: Table =>
         val buf = ListBuffer[ActorModel]()
-        t.getChildren.map(buildModel).foreach(buf += _)
-        new Collection(t, buf)
-      case any => new Leaf(any)
+        table.getCells.map(buildModel(_, params)).foreach(buf += _)
+        new Collection(table, data, buf)
+      case group: Group =>
+        val buf = ListBuffer[ActorModel]()
+        group.getChildren.map(buildModel(_, params)).foreach(buf += _)
+        new Collection(group, data, buf)
+      case any => new Leaf(any, data)
     }
   }
 
   def createTree(model: ActorModel): Tree.Node = {
     val t = new Table(skin)
-    t.add(model.actor.toString).padRight(2)
-    t.add(model.actor.getClass.getSimpleName, "hint")
+    model.obj match {
+      case a: Actor =>
+        t.add(model.obj.toString).padRight(2)
+        t.add(model.obj.getClass.getSimpleName, "hint")
+      case any => t.add(any.getClass.getSimpleName, "hint")
+    }
+
     val node = new Tree.Node(t)
     node.setObject(model)
     model match {
@@ -122,32 +148,35 @@ class EditorState(val assets: AssetManager) extends AppState {
       Gdx.gl.glDisable(GL20.GL_BLEND)
       renderer.end()
     }
-    Table.drawDebug(stage)
   }
 
 
   def drawDebug(model: ActorModel): Unit = {
-    val actor = model.actor
-    val bottomLeft = actor.localToStageCoordinates(tmp1.set(0, 0))
-    val bottomRight = actor.localToStageCoordinates(tmp2.set(actor.getWidth, 0))
-    val topLeft = actor.localToStageCoordinates(tmp3.set(0, actor.getHeight))
-    val topRight = actor.localToStageCoordinates(tmp4.set(actor.getWidth, actor.getHeight))
-    if (tree.getSelection.first() != null && model == tree.getSelection.first().getObject) {
-      renderer.setColor(Color.WHITE)
-      Gdx.gl.glLineWidth(6)
-    } else if (tree.getOverNode != null && model == tree.getOverNode.getObject) {
-      renderer.setColor(Color.GRAY)
-      Gdx.gl.glLineWidth(4)
-    } else {
-      renderer.setColor(Color.BLACK)
-      Gdx.gl.glLineWidth(2)
+    val actor = model.obj
+    actor match {
+      case a: Actor =>
+        val bottomLeft = a.localToStageCoordinates(tmp1.set(0, 0))
+        val bottomRight = a.localToStageCoordinates(tmp2.set(a.getWidth, 0))
+        val topLeft = a.localToStageCoordinates(tmp3.set(0, a.getHeight))
+        val topRight = a.localToStageCoordinates(tmp4.set(a.getWidth, a.getHeight))
+        if (tree.getSelection.first() != null && model == tree.getSelection.first().getObject) {
+          renderer.setColor(Color.WHITE)
+          Gdx.gl.glLineWidth(3)
+        } else if (tree.getOverNode != null && model == tree.getOverNode.getObject) {
+          renderer.setColor(Color.GRAY)
+          Gdx.gl.glLineWidth(2)
+        } else {
+          renderer.setColor(Color.BLACK)
+          Gdx.gl.glLineWidth(1)
+        }
+        renderer.line(bottomLeft, bottomRight)
+        renderer.line(bottomLeft, topLeft)
+        renderer.line(topLeft, topRight)
+        renderer.line(bottomRight, topRight)
+        renderer.flush()
+        Gdx.gl.glLineWidth(1)
+      case _ =>
     }
-    renderer.line(bottomLeft, bottomRight)
-    renderer.line(bottomLeft, topLeft)
-    renderer.line(topLeft, topRight)
-    renderer.line(bottomRight, topRight)
-    renderer.flush()
-    Gdx.gl.glLineWidth(1)
 
     model match {
       case w: Wrapper =>

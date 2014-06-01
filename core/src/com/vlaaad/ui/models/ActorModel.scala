@@ -1,13 +1,13 @@
 package com.vlaaad.ui.models
 
 import scala.collection.mutable.ListBuffer
-import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.utils.ObjectMap
 
 /** Created 01.06.14 by vlaaad */
-sealed abstract class ActorModel(val actor: Actor)
+sealed abstract class ActorModel(val obj: AnyRef, val data: ObjectMap[String, Object])
 
-class Wrapper(actor: Actor, var model: Option[ActorModel]) extends ActorModel(actor)
+class Wrapper(obj: AnyRef, data: ObjectMap[String, Object], var model: Option[ActorModel]) extends ActorModel(obj, data)
 
-class Leaf(actor: Actor) extends ActorModel(actor)
+class Leaf(obj: AnyRef, data: ObjectMap[String, Object]) extends ActorModel(obj, data)
 
-class Collection(actor: Actor, val models: ListBuffer[ActorModel]) extends ActorModel(actor)
+class Collection(obj: AnyRef, data: ObjectMap[String, Object], val models: ListBuffer[ActorModel]) extends ActorModel(obj, data)
