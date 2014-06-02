@@ -6,21 +6,19 @@ import com.vlaaad.ui.UiLayout
 import com.badlogic.gdx.scenes.scene2d.ui._
 import com.badlogic.gdx.scenes.scene2d.utils.{TiledDrawable, ChangeListener}
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent
-import com.badlogic.gdx.scenes.scene2d.{Group, Actor}
+import com.badlogic.gdx.scenes.scene2d.Actor
 import javax.swing.JFileChooser
 import java.io.File
 import javax.swing.filechooser.FileFilter
 import com.badlogic.gdx.files.FileHandle
-import collection.convert.wrapAll._
 import com.badlogic.gdx.Gdx
-import com.vlaaad.ui.models.{Collection, Wrapper, Leaf, ActorModel}
 import com.badlogic.gdx.utils.ObjectMap
-import scala.collection.mutable.ListBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.graphics.{Color, GL20}
 import com.vlaaad.ui.view.WorkSpace
-import com.esotericsoftware.tablelayout.Cell
+import com.vlaaad.ui.util._
+import collection.convert.wrapAsScala._
 
 
 /** Created 29.05.14 by vlaaad */
@@ -33,7 +31,7 @@ class EditorState(val assets: AssetManager) extends AppState {
   var layout: UiLayout = _
   val workspace: WorkSpace = new WorkSpace()
   val renderer = new ShapeRenderer()
-  var model: ActorModel = _
+  var model: EditorModel[_] = _
   val tmp1 = new Vector2()
   val tmp2 = new Vector2()
   val tmp3 = new Vector2()
@@ -45,11 +43,11 @@ class EditorState(val assets: AssetManager) extends AppState {
     stage.addActor(layout.getActor)
     main = layout.get(classOf[Table])
     main.debug()
-    treeContainer = layout.get(classOf[Container], "tree")
-    workspaceContainer = layout.get(classOf[Container], "workspace")
+    treeContainer = layout.get(classOf[Container], "content", "tree")
+    workspaceContainer = layout.get(classOf[Container], "content", "workspace")
     workspaceContainer.setBackground(new TiledDrawable(skin.getRegion("workspace-background")))
     workspaceContainer.setWidget(workspace)
-    layout.get(classOf[Button], "open").addListener(new ChangeListener {
+    layout.get(classOf[Button], "top-panel", "open").addListener(new ChangeListener {
       override def changed(event: ChangeEvent, actor: Actor): Unit = {
         val chooser = new JFileChooser()
         chooser.setDialogType(JFileChooser.OPEN_DIALOG)
@@ -78,45 +76,27 @@ class EditorState(val assets: AssetManager) extends AppState {
     workspace.setWidget(layout.getActor)
     model = buildModel(layout.getActor, params)
     tree = new Tree(skin)
-    tree.add(createTree(model))
+    tree.add(createNode(model))
     tree.expandAll()
     tree.getSelection.setMultiple(false)
     tree.addListener(new ChangeListener {
       override def changed(event: ChangeEvent, actor: Actor): Unit = {
         println(s"chang event, selected = ${Option(tree.getSelection.first).map(_.getObject)}")
         Option(tree.getSelection.first).map(_.getObject) match {
-          case Some(v) => v
-          case None =>
+          case Some(v: EditorModel[_]) => showParams(v)
+          case None => hideParams()
         }
       }
     })
     treeContainer.setWidget(tree)
   }
 
-  def buildModel(obj: Object, params: ObjectMap[Object, ObjectMap[String, Object]]): ActorModel = {
-    val data = params.get(obj)
-    obj match {
-      case label: Label =>
-        new Leaf(label, data)
-      case tb: Button =>
-        new Leaf(tb, data)
-      case c: Container =>
-        new Wrapper(c, data, if (c.getWidget == null) None else Some(buildModel(c.getWidget, params)))
-      case cell: Cell[AnyRef] =>
-        new Wrapper(cell, data, Option(cell.getWidget).map(v => buildModel(v, params)))
-      case table: Table =>
-        val buf = ListBuffer[ActorModel]()
-        table.getCells.map(buildModel(_, params)).foreach(buf += _)
-        new Collection(table, data, buf)
-      case group: Group =>
-        val buf = ListBuffer[ActorModel]()
-        group.getChildren.map(buildModel(_, params)).foreach(buf += _)
-        new Collection(group, data, buf)
-      case any => new Leaf(any, data)
-    }
+  def buildModel(obj: Object, params: ObjectMap[Object, ObjectMap[String, Object]]): EditorModel[_] = {
+    //    val data = params.get(obj)
+    EditorToolkit.createModel(obj, params)
   }
 
-  def createTree(model: ActorModel): Tree.Node = {
+  def createNode(model: EditorModel[_]): Tree.Node = {
     val t = new Table(skin)
     model.obj match {
       case a: Actor =>
@@ -124,16 +104,18 @@ class EditorState(val assets: AssetManager) extends AppState {
         t.add(model.obj.getClass.getSimpleName, "hint")
       case any => t.add(any.getClass.getSimpleName, "hint")
     }
-
     val node = new Tree.Node(t)
     node.setObject(model)
     model match {
-      case leaf: Leaf =>
-      case wrapper: Wrapper =>
-        if (wrapper.model.isDefined)
-          node.add(createTree(wrapper.model.get))
-      case coll: Collection =>
-        coll.models.foreach(v => node.add(createTree(v)))
+      case leaf: Element[_] => println(s"is leaf! $leaf");
+      case wrapper: Wrapper[_, _] =>
+        Option(wrapper.wrapped).foreach(v => {
+          node.add(createNode(v))
+        })
+      case coll: Collection[_, _] =>
+        coll.elements.foreach(v => {
+          node.add(createNode(v))
+        })
     }
     node
   }
@@ -150,8 +132,18 @@ class EditorState(val assets: AssetManager) extends AppState {
     }
   }
 
+  def showParams(model: EditorModel[_]): Unit = {
+    println(s"show params: ${model.params}")
 
-  def drawDebug(model: ActorModel): Unit = {
+    println(EditorToolkit.dump(model, skin))
+  }
+
+  def hideParams(): Unit = {
+    println("hide params!")
+  }
+
+
+  def drawDebug(model: EditorModel[_]): Unit = {
     val actor = model.obj
     actor match {
       case a: Actor =>
@@ -179,11 +171,11 @@ class EditorState(val assets: AssetManager) extends AppState {
     }
 
     model match {
-      case w: Wrapper =>
-        w.model.foreach(drawDebug)
-      case l: Leaf =>
-      case c: Collection =>
-        c.models.foreach(drawDebug)
+      case w: Wrapper[_, _] =>
+        Option(w.wrapped) foreach drawDebug
+      case l: Element[_] =>
+      case c: Collection[_, _] =>
+        c.elements foreach drawDebug
     }
   }
 }

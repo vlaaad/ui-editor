@@ -13,6 +13,8 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.tablelayout.Cell;
 import com.vlaaad.ui.UiAlign;
+import com.vlaaad.ui.scene2d.HorizontalList;
+import com.vlaaad.ui.scene2d.VerticalList;
 import com.vlaaad.ui.util.instantiators.ReflectionInstantiator;
 
 /**
@@ -371,26 +373,46 @@ public class Toolkit {
         instantiator("container", Container.class, new Instantiator<Container>() {
 
             @Override public Container newInstance(Resources resources) {
-//                Actor widget = ;
                 return new Container(value.has("widget") ? (Actor) instantiate(value.get("widget")) : null);
             }
         });
-        instantiator("table", Table.class, new Instantiator<Table>() {
-            @Override public Table newInstance(Resources resources) {
-                Table table = new Table(skin);
-                if (!value.has("cells"))
-                    return table;
-                for (JsonValue row : value.get("cells")) {
-                    for (JsonValue cellValue : row) {
-                        Actor actor = instantiate(cellValue.get("widget"));
-                        Cell cell = table.add(actor);
-                        System.out.println("INJECT CELL OF " + actor);
-                        inject(cell, cellValue);
-                        System.out.println("ended injecting");
-                    }
-                    table.row();
+
+        instantiator("vertical-list", VerticalList.class, new Instantiator<VerticalList>() {
+            @Override public VerticalList newInstance(Resources resources) {
+                VerticalList list = new VerticalList(skin);
+                if (!value.has("elements"))
+                    return list;
+                for (JsonValue element : value.get("elements")) {
+                    Actor actor = instantiate(element.get("widget"));
+                    Cell cell = list.add(actor);
+                    inject(cell, element);
                 }
-                return table;
+                return list;
+            }
+        });
+        instantiator("horizontal-list", HorizontalList.class, new Instantiator<HorizontalList>() {
+            @Override public HorizontalList newInstance(Resources resources) {
+                HorizontalList list = new HorizontalList(skin);
+                if (!value.has("elements"))
+                    return list;
+                for (JsonValue element : value.get("elements")) {
+                    Actor actor = instantiate(element.get("widget"));
+                    Cell cell = list.add(actor);
+                    inject(cell, element);
+                }
+                return list;
+            }
+        });
+        instantiator("group", Group.class, new Instantiator<Group>() {
+            @Override public Group newInstance(Resources resources) {
+                Group group = new Group();
+                if (!value.has("elements"))
+                    return group;
+                for (JsonValue element : value.get("elements")) {
+                    Actor actor = instantiate(element.get("widget"));
+                    group.addActor(actor);
+                }
+                return group;
             }
         });
         instantiator("progressBar", ProgressBar.class, new Instantiator<ProgressBar>() {
@@ -441,7 +463,6 @@ public class Toolkit {
                 continue;
             Object value = extract(applier.valueClass, v, s);
             if (injected != null) injected.put(v.name(), value);
-            System.out.println("injected " + v.name() + "=" + value);
             applier.apply(o, value);
         }
     }
@@ -544,6 +565,10 @@ public class Toolkit {
     @SuppressWarnings("unchecked")
     public static <T> Instantiator<T> instantiator(Class<T> type) {
         return instantiators.get(type);
+    }
+
+    public static String tag(Class type) {
+        return tags.findKey(type, true);
     }
 
     public static <T> void instantiator(String tag, Class<T> objectType, Instantiator<T> instantiator) {

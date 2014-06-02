@@ -1,55 +1,69 @@
 {
-    type: table,
+    type: vertical-list,
     name: root,
     align: top,
     minWidth: 300,
     minHeight: 300,
     fillParent: true,
-    cells: [
-        [
-            {
-                widget: {
-                    type: textButton,
-                    name: open,
-                    style: default,
-                    text: "You finally did it!"
-                },
-                minHeight: 20,
-                prefHeight: 20,
-                maxHeight: 20,
-                minWidth: 100,
-                expandX: true,
-                width: 100,
-                colspan: 2
-            }
-        ],
-        [
-            {
-                widget: {
-                   type: container,
-                   name: workspace,
-                   background: workspace-background,
-                   fillX: true,
-                   fillY: true
-                },
-                expandX: true,
-                expandY: true,
-                fillX: true,
-                fillY: true
+    elements: [
+        {
+            widget: {
+                type: horizontal-list,
+                name: top-panel,
+                align: left,
+                elements: [
+                    {
+                        widget: {
+                            type: textButton,
+                            name: open,
+                            style: default,
+                            text: "You finally did it!"
+                        }
+                    }
+                ]
             },
-            {
-                widget: {
-                    type: container,
-                    name: tree,
-                    fillX: true,
-                    fillY: true
-                },
-                minWidth: 200,
-                expandY: true,
-                fillX: true,
-                fillY: true
-            }
-        ]
+            minHeight: 25,
+            prefHeight: 25,
+            maxHeight: 25,
+            expandX: true,
+            fillX: true
+        },
+        {
+            widget: {
+                type: horizontal-list,
+                name: content,
+                elements: [
+                    {
+                        widget: {
+                           type: container,
+                           name: workspace,
+                           background: workspace-background,
+                           fillX: true,
+                           fillY: true
+                        },
+                        expandX: true,
+                        expandY: true,
+                        fillX: true,
+                        fillY: true
+                    },
+                    {
+                        widget: {
+                            type: container,
+                            name: tree,
+                            fillX: true,
+                            fillY: true
+                        },
+                        minWidth: 200,
+                        expandY: true,
+                        fillX: true,
+                        fillY: true
+                    }
+                ]
+            },
+            expandX: true,
+            expandY: true,
+            fillX: true,
+            fillY: true
+        }
     ]
-
 }
