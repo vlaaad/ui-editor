@@ -4,7 +4,6 @@
 "fillParent": true,
 "elements": [
 	{
-		"type": null,
 		"prefHeight": 25,
 		"maxHeight": 25,
 		"fillX": true,
@@ -15,22 +14,28 @@
 			"name": "top-panel",
 			"elements": [
 				{
-					"type": null,
+					"maxHeight": 25,
 					"widget": {
 						"type": "text-button",
 						"name": "open",
-						"text": "You finally did it!",
-						"style": "default"
+						"text": "Open",
+						"style": "default",
+						"disabled": false
 					}
 				},
 				{
-				    widget: {type: text-button, name: save, text: Save, style: default}
+					"maxHeight": 25,
+					"widget": {
+						"type": "text-button",
+						"name": "save",
+						"text": "Save",
+						"style": "default"
+					}
 				}
 			]
 		}
 	},
 	{
-		"type": null,
 		"fillX": true,
 		"fillY": true,
 		"expandX": true,
@@ -40,7 +45,6 @@
 			"name": "content",
 			"elements": [
 				{
-					"type": null,
 					"fillX": true,
 					"fillY": true,
 					"expandX": true,
@@ -54,40 +58,43 @@
 					}
 				},
 				{
-					"type": null,
 					"minWidth": 200,
 					"fillX": true,
 					"fillY": true,
+					"expandX": false,
 					"expandY": true,
 					"widget": {
-					    "elements": [
-					        {
-					            widget: {
-					                type: container,
-					                name: tree,
-					                align: top,
-					                fillX: true
-					            },
-					            expandX: true,
-					            expandY: true,
-					            fillX: true,
-					            fillY: true
-					        },
-					        {
-					            widget: {
-					                type: container,
-					                name: params
-					            },
-					            expandX: true,
-					            fillX: true,
-					            fillY: true,
-					            minHeight: 200
-					        }
-					    ],
-						"type": "vertical-list",
+						"type": "horizontal-list",
 						"name": "panel",
-						"fillX": true,
-						"fillY": true
+						"elements": [
+							{
+								"minWidth": 200,
+								"fillX": true,
+								"fillY": true,
+								"expandX": true,
+								"expandY": true,
+								"widget": {
+									"type": "container",
+									"align": "top",
+									"name": "tree",
+									"fillX": true,
+									"fillY": false
+								}
+							},
+							{
+								"minWidth": 200,
+								"fillX": true,
+								"fillY": true,
+								"expandX": true,
+								"expandY": true,
+								"widget": {
+									"type": "container",
+									"align": "top",
+									"name": "params",
+									"fillX": true
+								}
+							}
+						]
 					}
 				}
 			]

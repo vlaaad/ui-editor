@@ -293,6 +293,7 @@ public class Toolkit {
             @Override protected Label.LabelStyle getDefaultValue(Label o, Skin skin) {
                 return skin.get(Label.LabelStyle.class);
             }
+
             @Override public void apply(Label o, Label.LabelStyle v) {
                 o.setStyle(v);
             }
@@ -327,36 +328,6 @@ public class Toolkit {
         applier("align", Container.class, UiAlign.class, UiAlign.center, new Applier<Container, UiAlign>() {
             @Override public void apply(Container o, UiAlign v) {
                 o.align(v.value);
-            }
-        });
-        applier("minWidth", Container.class, Float.class, new Applier<Container, Float>() {
-            @Override public void apply(Container o, Float v) {
-                o.minWidth(v);
-            }
-        });
-        applier("minHeight", Container.class, Float.class, new Applier<Container, Float>() {
-            @Override public void apply(Container o, Float v) {
-                o.minHeight(v);
-            }
-        });
-        applier("prefWidth", Container.class, Float.class, new Applier<Container, Float>() {
-            @Override public void apply(Container o, Float v) {
-                o.prefWidth(v);
-            }
-        });
-        applier("prefHeight", Container.class, Float.class, new Applier<Container, Float>() {
-            @Override public void apply(Container o, Float v) {
-                o.prefHeight(v);
-            }
-        });
-        applier("maxWidth", Container.class, Float.class, new Applier<Container, Float>() {
-            @Override public void apply(Container o, Float v) {
-                o.maxWidth(v);
-            }
-        });
-        applier("maxHeight", Container.class, Float.class, new Applier<Container, Float>() {
-            @Override public void apply(Container o, Float v) {
-                o.maxHeight(v);
             }
         });
         applier("padTop", Container.class, Float.class, new Applier<Container, Float>() {
@@ -419,6 +390,7 @@ public class Toolkit {
             @Override protected ProgressBar.ProgressBarStyle getDefaultValue(ProgressBar o, Skin skin) {
                 return skin.get(ProgressBar.ProgressBarStyle.class);
             }
+
             @Override public void apply(ProgressBar o, ProgressBar.ProgressBarStyle v) {
                 o.setStyle(v);
             }
@@ -433,6 +405,7 @@ public class Toolkit {
             @Override protected ScrollPane.ScrollPaneStyle getDefaultValue(ScrollPane o, Skin skin) {
                 return skin.get(ScrollPane.ScrollPaneStyle.class);
             }
+
             @Override public void apply(ScrollPane o, ScrollPane.ScrollPaneStyle v) {
                 o.setStyle(v);
             }

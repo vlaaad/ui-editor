@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.tablelayout.Cell;
 import com.vlaaad.ui.util.inputs.EditorInput;
 import com.vlaaad.ui.util.inputs.EmptyInput;
+import com.vlaaad.ui.util.inputs.EnumInput;
 import com.vlaaad.ui.util.inputs.TextInput;
 import com.vlaaad.ui.util.inputs.factories.EditorInputFactory;
 import com.vlaaad.ui.util.models.CollectionFactory;
@@ -108,6 +109,9 @@ public class EditorToolkit {
 
     @SuppressWarnings("unchecked")
     public static <T> EditorInput<T> createInput(T initialValue, Class<T> type, Skin layoutSkin, Skin editorSkin) {
+        if (type.isEnum()) {
+            return new EnumInput<T>(type.getEnumConstants(), initialValue, editorSkin);
+        }
         EditorInputFactory<T> factory = inputs.get(type);
         if (factory != null) {
             return factory.create(initialValue, layoutSkin, editorSkin);
