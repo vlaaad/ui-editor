@@ -1,12 +1,26 @@
 package com.vlaaad.ui.util;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.JsonWriter;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.tablelayout.Cell;
+import com.vlaaad.ui.util.inputs.EditorInput;
+import com.vlaaad.ui.util.inputs.EmptyInput;
+import com.vlaaad.ui.util.inputs.TextInput;
+import com.vlaaad.ui.util.inputs.factories.EditorInputFactory;
+import com.vlaaad.ui.util.models.CollectionFactory;
+import com.vlaaad.ui.util.models.EditorModelFactory;
+import com.vlaaad.ui.util.models.ElementFactory;
+import com.vlaaad.ui.util.models.WrapperFactory;
 
 import java.io.StringWriter;
 
@@ -15,17 +29,9 @@ import java.io.StringWriter;
  */
 public class EditorToolkit {
 
-    private static final Json json = new Json();
+    private static final ObjectMap<Class, EditorModelFactory> factories = new ObjectMap<Class, EditorModelFactory>();
 
-    static {
-        json.setUsePrototypes(false);
-        json.setTypeName(null);
-        json.setOutputType(JsonWriter.OutputType.json);
-    }
-
-    private static final ObjectMap<Class, Factory> models = new ObjectMap<Class, Factory>();
-    private static final ObjectMap<Class, Stringifier> stringifiers = new ObjectMap<Class, Stringifier>();
-    private static final ObjectMap<Class, Saver> savers = new ObjectMap<Class, Saver>();
+    private static final ObjectMap<Class, EditorInputFactory> inputs = new ObjectMap<Class, EditorInputFactory>();
 
     static {
         factory(Object.class, new ElementFactory<Object>());
@@ -42,12 +48,78 @@ public class EditorToolkit {
         });
     }
 
+    static {
+        input(Float.class, new EditorInputFactory<Float>() {
+            @Override public EditorInput<Float> create(final Float initialValue, Skin layoutSkin, final Skin editorSkin) {
+                return new TextInput<Float>(initialValue, editorSkin) {
+                    @Override protected Float toValue(String text) {
+                        return Float.valueOf(text);
+                    }
+                };
+            }
+        });
+        input(Integer.class, new EditorInputFactory<Integer>() {
+            @Override public EditorInput<Integer> create(final Integer initialValue, Skin layoutSkin, final Skin editorSkin) {
+                return new TextInput<Integer>(initialValue, editorSkin) {
+                    @Override protected Integer toValue(String text) {
+                        return Integer.valueOf(text);
+                    }
+                };
+            }
+        });
+        input(String.class, new EditorInputFactory<String>() {
+            @Override public EditorInput<String> create(final String initialValue, Skin layoutSkin, final Skin editorSkin) {
+                return new TextInput<String>(initialValue, editorSkin) {
+                    @Override protected String toValue(String text) {
+                        return text;
+                    }
+                };
+            }
+        });
+        input(Boolean.class, new EditorInputFactory<Boolean>() {
+            @Override public EditorInput<Boolean> create(final Boolean initialValue, Skin layoutSkin, final Skin editorSkin) {
+                return new EditorInput<Boolean>(initialValue) {
+                    private final CheckBox checkBox = new CheckBox("", editorSkin);
+
+                    {
+                        checkBox.setChecked(initialValue == null ? false : initialValue);
+                        checkBox.addListener(new ChangeListener() {
+                            @Override public void changed(ChangeEvent event, Actor actor) {
+                                dispatcher.setState(checkBox.isChecked());
+                            }
+                        });
+                    }
+
+                    @Override public Actor getActor() {
+                        return checkBox;
+                    }
+                };
+            }
+        });
+    }
+
+    public static <T> void factory(Class<T> type, EditorModelFactory<T> factory) {
+        factories.put(type, factory);
+    }
+
+    public static <T> void input(Class<T> type, EditorInputFactory<T> inputFactory) {
+        inputs.put(type, inputFactory);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> EditorInput<T> createInput(T initialValue, Class<T> type, Skin layoutSkin, Skin editorSkin) {
+        EditorInputFactory<T> factory = inputs.get(type);
+        if (factory != null) {
+            return factory.create(initialValue, layoutSkin, editorSkin);
+        }
+        return new EmptyInput<T>(initialValue, editorSkin);
+    }
 
     @SuppressWarnings("unchecked")
     public static <T> EditorModel<T> createModel(T t, ObjectMap<Object, ObjectMap<String, Object>> params) {
         Class type = t.getClass();
         while (type != null) {
-            Factory f = models.get(type);
+            EditorModelFactory f = factories.get(type);
             if (f != null) {
 //                System.out.println("build model for " + t + " using class " + type);
                 return f.newInstance(t, params);
@@ -55,10 +127,6 @@ public class EditorToolkit {
             type = type.getSuperclass();
         }
         throw new IllegalStateException();
-    }
-
-    private static <T> void factory(Class<T> type, Factory<T> factory) {
-        models.put(type, factory);
     }
 
     public static String dump(EditorModel<?> model, Skin skin) {
@@ -69,13 +137,14 @@ public class EditorToolkit {
         settings.outputType = JsonWriter.OutputType.json;
         settings.singleLineColumns = 60;
         return new JsonReader().parse(stringWriter.toString()).prettyPrint(settings);
-//        return stringWriter.toString();
     }
 
     public static void dump(JsonWriter writer, EditorModel<?> model, Skin skin) {
         try {
             writer.object();
-            writer.set("type", Toolkit.tag(model.obj().getClass()));
+            String tag = Toolkit.tag(model.obj().getClass());
+            if (tag != null)
+                writer.set("type", tag);
             for (ObjectMap.Entry<String, Object> entry : model.params()) {
                 writer.set(entry.key, simplify(entry.value, skin));
             }
@@ -89,8 +158,14 @@ public class EditorToolkit {
         }
     }
 
-
     public static Object simplify(Object o, Skin skin) {
+        if (o == null)
+            return null;
+        Class knownType = o.getClass();
+        if (o.getClass().isPrimitive() || knownType == String.class || knownType == Integer.class
+            || knownType == Boolean.class || knownType == Float.class || knownType == Long.class || knownType == Double.class
+            || knownType == Short.class || knownType == Byte.class || knownType == Character.class)
+            return o;
         String skinElement = skin.find(o);
         if (skinElement != null)
             return skinElement;
@@ -104,52 +179,4 @@ public class EditorToolkit {
         return o.toString();
     }
 
-    public interface Saver<T> {
-        void save(T v, Skin skin);
-    }
-
-    public abstract static class Factory<T> {
-        public final EditorModel<T> newInstance(T t, ObjectMap<Object, ObjectMap<String, Object>> params) {
-            return create(t, params(t, params), params);
-        }
-
-        protected final ObjectMap<String, Object> params(Object o, ObjectMap<Object, ObjectMap<String, Object>> params) {
-            return params.containsKey(o) ? params.get(o) : new ObjectMap<String, Object>();
-        }
-
-        public abstract EditorModel<T> create(T t, ObjectMap<String, Object> params, ObjectMap<Object, ObjectMap<String, Object>> full);
-    }
-
-    public static class ElementFactory<T> extends Factory<T> {
-
-        @Override public EditorModel<T> create(T t, ObjectMap<String, Object> params, ObjectMap<Object, ObjectMap<String, Object>> full) {
-            return new Element<T>(t, params);
-        }
-    }
-
-    public static abstract class WrapperFactory<T> extends Factory<T> {
-
-        @Override public EditorModel<T> create(T t, ObjectMap<String, Object> params, ObjectMap<Object, ObjectMap<String, Object>> full) {
-            Object wrapped = getWrapped(t);
-            return new Wrapper<T, Object>(t, params, wrapped == null ? null : createModel(wrapped, full));
-        }
-
-        protected abstract Object getWrapped(T t);
-    }
-
-    public static abstract class CollectionFactory<T> extends Factory<T> {
-        @Override public EditorModel<T> create(T t, ObjectMap<String, Object> params, ObjectMap<Object, ObjectMap<String, Object>> full) {
-            Array<EditorModel<Object>> arr = new Array<EditorModel<Object>>();
-            for (Object element : getElements(t)) {
-                arr.add(createModel(element, full));
-            }
-            return new Collection<T, Object>(t, params, arr);
-        }
-
-        protected abstract Iterable<? extends Object> getElements(T t);
-    }
-
-    public abstract static class Stringifier<T> {
-        public abstract String toString(T value, Skin skin);
-    }
 }

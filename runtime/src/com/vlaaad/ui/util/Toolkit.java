@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.tablelayout.Cell;
+import com.esotericsoftware.tablelayout.Value;
 import com.vlaaad.ui.UiAlign;
 import com.vlaaad.ui.scene2d.HorizontalList;
 import com.vlaaad.ui.scene2d.VerticalList;
@@ -35,170 +36,239 @@ public class Toolkit {
     private Toolkit() {}
 
     protected static void init() {
-        applier("name", Actor.class, String.class, new Applier<Actor, String>() {
+        applier("name", Actor.class, String.class, "unnamed", new Applier<Actor, String>() {
             @Override public void apply(Actor o, String v) {
                 o.setName(v);
             }
         });
-        applier("x", Actor.class, Float.class, new Applier<Actor, Float>() {
+        applier("x", Actor.class, Float.class, 0f, new Applier<Actor, Float>() {
             @Override public void apply(Actor o, Float v) {
                 o.setX(v);
             }
         });
-        applier("y", Actor.class, Float.class, new Applier<Actor, Float>() {
+        applier("y", Actor.class, Float.class, 0f, new Applier<Actor, Float>() {
             @Override public void apply(Actor o, Float v) {
                 o.setY(v);
             }
         });
-        applier("width", Actor.class, Float.class, new Applier<Actor, Float>() {
+        applier("width", Actor.class, Float.class, 0f, new Applier<Actor, Float>() {
             @Override public void apply(Actor o, Float v) {
                 o.setWidth(v);
             }
         });
-        applier("rotation", Actor.class, Float.class, new Applier<Actor, Float>() {
+        applier("rotation", Actor.class, Float.class, 0f, new Applier<Actor, Float>() {
             @Override public void apply(Actor o, Float v) {
                 o.setRotation(v);
             }
         });
-        applier("scaleX", Actor.class, Float.class, new Applier<Actor, Float>() {
+        applier("scaleX", Actor.class, Float.class, 1f, new Applier<Actor, Float>() {
             @Override public void apply(Actor o, Float v) {
                 o.setScaleX(v);
             }
         });
-        applier("scaleY", Actor.class, Float.class, new Applier<Actor, Float>() {
+        applier("scaleY", Actor.class, Float.class, 1f, new Applier<Actor, Float>() {
             @Override public void apply(Actor o, Float v) {
                 o.setScaleY(v);
             }
         });
-        applier("originX", Actor.class, Float.class, new Applier<Actor, Float>() {
+        applier("originX", Actor.class, Float.class, 0f, new Applier<Actor, Float>() {
             @Override public void apply(Actor o, Float v) {
                 o.setOriginX(v);
             }
         });
-        applier("originY", Actor.class, Float.class, new Applier<Actor, Float>() {
+        applier("originY", Actor.class, Float.class, 0f, new Applier<Actor, Float>() {
             @Override public void apply(Actor o, Float v) {
                 o.setOriginY(v);
             }
         });
-        applier("color", Actor.class, Color.class, new Applier<Actor, Color>() {
+        applier("color", Actor.class, Color.class, Color.WHITE, new Applier<Actor, Color>() {
             @Override public void apply(Actor o, Color v) {
                 o.setColor(v);
             }
         });
         applier("touchable", Actor.class, Touchable.class, new Applier<Actor, Touchable>() {
+            @Override protected Touchable getDefaultValue(Actor o, Skin skin) {
+                if (o instanceof Button)
+                    return Touchable.enabled;
+                if (o instanceof Table || o instanceof Container || o instanceof Stack || o instanceof VerticalGroup || o instanceof HorizontalGroup)
+                    return Touchable.childrenOnly;
+                return Touchable.enabled;
+            }
+
             @Override public void apply(Actor o, Touchable v) {
                 o.setTouchable(v);
             }
         });
 
         applier("transform", Group.class, Boolean.class, new Applier<Group, Boolean>() {
+
+            @Override protected Boolean getDefaultValue(Group o, Skin skin) {
+                return !(o instanceof Container || o instanceof Stack || o instanceof Table);
+            }
+
             @Override public void apply(Group o, Boolean v) {
                 o.setTransform(v);
             }
         });
 
-        applier("fillParent", Layout.class, Boolean.class, new Applier<Layout, Boolean>() {
+        applier("fillParent", Layout.class, Boolean.class, false, new Applier<Layout, Boolean>() {
             @Override public void apply(Layout o, Boolean v) {
-                o.setFillParent(true);
+                o.setFillParent(v);
             }
         });
 
         applier("minWidth", Cell.class, Float.class, new Applier<Cell, Float>() {
+            @Override public void applyDefault(Cell o, Skin skin) {
+                o.minWidth(Value.minWidth);
+            }
+
             @Override public void apply(Cell o, Float v) {
                 o.minWidth(v);
             }
         });
         applier("minHeight", Cell.class, Float.class, new Applier<Cell, Float>() {
+            @Override public void applyDefault(Cell o, Skin skin) {
+                o.minHeight(Value.minHeight);
+            }
+
             @Override public void apply(Cell o, Float v) {
                 o.minHeight(v);
             }
         });
         applier("prefWidth", Cell.class, Float.class, new Applier<Cell, Float>() {
+            @Override public void applyDefault(Cell o, Skin skin) {
+                o.prefWidth(Value.prefWidth);
+            }
+
             @Override public void apply(Cell o, Float v) {
                 o.prefWidth(v);
             }
         });
         applier("prefHeight", Cell.class, Float.class, new Applier<Cell, Float>() {
+            @Override public void applyDefault(Cell o, Skin skin) {
+                o.prefHeight(Value.prefHeight);
+            }
+
             @Override public void apply(Cell o, Float v) {
                 o.prefHeight(v);
             }
         });
         applier("maxWidth", Cell.class, Float.class, new Applier<Cell, Float>() {
+            @Override public void applyDefault(Cell o, Skin skin) {
+                o.maxWidth(Value.maxWidth);
+            }
+
             @Override public void apply(Cell o, Float v) {
                 o.maxWidth(v);
             }
         });
         applier("maxHeight", Cell.class, Float.class, new Applier<Cell, Float>() {
+            @Override public void applyDefault(Cell o, Skin skin) {
+                o.maxHeight(Value.maxHeight);
+            }
+
             @Override public void apply(Cell o, Float v) {
                 o.maxHeight(v);
             }
         });
         applier("spaceTop", Cell.class, Float.class, new Applier<Cell, Float>() {
+            @Override public void applyDefault(Cell o, Skin skin) {
+                o.spaceTop(Value.zero);
+            }
+
             @Override public void apply(Cell o, Float v) {
                 o.spaceTop(v);
             }
         });
         applier("spaceLeft", Cell.class, Float.class, new Applier<Cell, Float>() {
+            @Override public void applyDefault(Cell o, Skin skin) {
+                o.spaceRight(Value.zero);
+            }
+
             @Override public void apply(Cell o, Float v) {
                 o.spaceLeft(v);
             }
         });
         applier("spaceBottom", Cell.class, Float.class, new Applier<Cell, Float>() {
+            @Override public void applyDefault(Cell o, Skin skin) {
+                o.spaceBottom(Value.zero);
+            }
+
             @Override public void apply(Cell o, Float v) {
                 o.spaceBottom(v);
             }
         });
         applier("spaceRight", Cell.class, Float.class, new Applier<Cell, Float>() {
+            @Override public void applyDefault(Cell o, Skin skin) {
+                o.spaceRight(Value.zero);
+            }
+
             @Override public void apply(Cell o, Float v) {
                 o.spaceRight(v);
             }
         });
         applier("padTop", Cell.class, Float.class, new Applier<Cell, Float>() {
+            @Override public void applyDefault(Cell o, Skin skin) {
+                o.padTop(Value.zero);
+            }
+
             @Override public void apply(Cell o, Float v) {
                 o.padTop(v);
             }
         });
         applier("padLeft", Cell.class, Float.class, new Applier<Cell, Float>() {
+            @Override public void applyDefault(Cell o, Skin skin) {
+                o.padLeft(Value.zero);
+            }
+
             @Override public void apply(Cell o, Float v) {
                 o.padLeft(v);
             }
         });
         applier("padBottom", Cell.class, Float.class, new Applier<Cell, Float>() {
+            @Override public void applyDefault(Cell o, Skin skin) {
+                o.padBottom(Value.zero);
+            }
+
             @Override public void apply(Cell o, Float v) {
                 o.padBottom(v);
             }
         });
         applier("padRight", Cell.class, Float.class, new Applier<Cell, Float>() {
+            @Override public void applyDefault(Cell o, Skin skin) {
+                o.padRight(Value.zero);
+            }
+
             @Override public void apply(Cell o, Float v) {
                 o.padRight(v);
             }
         });
-        applier("fillX", Cell.class, Float.class, new Applier<Cell, Float>() {
-            @Override public void apply(Cell o, Float v) {
-                o.fill(v, o.getFillY());
+        applier("fillX", Cell.class, Boolean.class, false, new Applier<Cell, Boolean>() {
+            @Override public void apply(Cell o, Boolean v) {
+                o.fill(v, o.getFillY() != 0);
             }
         });
-        applier("fillY", Cell.class, Float.class, new Applier<Cell, Float>() {
-            @Override public void apply(Cell o, Float v) {
-                o.fill(o.getFillX(), v);
+        applier("fillY", Cell.class, Boolean.class, false, new Applier<Cell, Boolean>() {
+            @Override public void apply(Cell o, Boolean v) {
+                o.fill(o.getFillX() != 0, v);
             }
         });
-        applier("expandX", Cell.class, Integer.class, new Applier<Cell, Integer>() {
-            @Override public void apply(Cell o, Integer v) {
-                o.expand(v, o.getExpandY());
+        applier("expandX", Cell.class, Boolean.class, false, new Applier<Cell, Boolean>() {
+            @Override public void apply(Cell o, Boolean v) {
+                o.expand(v, o.getExpandY() != 0);
             }
         });
-        applier("expandY", Cell.class, Integer.class, new Applier<Cell, Integer>() {
-            @Override public void apply(Cell o, Integer v) {
-                o.expand(o.getExpandX(), v);
+        applier("expandY", Cell.class, Boolean.class, false, new Applier<Cell, Boolean>() {
+            @Override public void apply(Cell o, Boolean v) {
+                o.expand(o.getExpandX() != 0, v);
             }
         });
-        applier("align", Cell.class, UiAlign.class, new Applier<Cell, UiAlign>() {
+        applier("align", Cell.class, UiAlign.class, UiAlign.center, new Applier<Cell, UiAlign>() {
             @Override public void apply(Cell o, UiAlign v) {
                 o.align(v.value);
             }
         });
-        applier("colspan", Cell.class, Integer.class, new Applier<Cell, Integer>() {
+        applier("colspan", Cell.class, Integer.class, 1, new Applier<Cell, Integer>() {
             @Override public void apply(Cell o, Integer v) {
                 o.colspan(v);
             }
@@ -209,22 +279,25 @@ public class Toolkit {
                 o.setText(v);
             }
         });
-        applier("align", Label.class, UiAlign.class, new Applier<Label, UiAlign>() {
+        applier("align", Label.class, UiAlign.class, UiAlign.left, new Applier<Label, UiAlign>() {
             @Override public void apply(Label o, UiAlign v) {
                 o.setAlignment(v.value);
             }
         });
-        applier("wrap", Label.class, Boolean.class, new Applier<Label, Boolean>() {
+        applier("wrap", Label.class, Boolean.class, false, new Applier<Label, Boolean>() {
             @Override public void apply(Label o, Boolean v) {
                 o.setWrap(v);
             }
         });
         applier("style", Label.class, Label.LabelStyle.class, new Applier<Label, Label.LabelStyle>() {
+            @Override protected Label.LabelStyle getDefaultValue(Label o, Skin skin) {
+                return skin.get(Label.LabelStyle.class);
+            }
             @Override public void apply(Label o, Label.LabelStyle v) {
                 o.setStyle(v);
             }
         });
-        applier("fontScale", Label.class, Float.class, new Applier<Label, Float>() {
+        applier("fontScale", Label.class, Float.class, 1f, new Applier<Label, Float>() {
             @Override public void apply(Label o, Float v) {
                 o.setFontScale(v);
             }
@@ -235,14 +308,23 @@ public class Toolkit {
                 o.setText(v);
             }
         });
+        applier("style", TextButton.class, TextButton.TextButtonStyle.class, new Applier<TextButton, TextButton.TextButtonStyle>() {
+            @Override protected TextButton.TextButtonStyle getDefaultValue(TextButton o, Skin skin) {
+                return skin.get(TextButton.TextButtonStyle.class);
+            }
 
-        applier("disabled", Disableable.class, Boolean.class, new Applier<Disableable, Boolean>() {
+            @Override public void apply(TextButton o, TextButton.TextButtonStyle v) {
+                o.setStyle(v);
+            }
+        });
+
+        applier("disabled", Disableable.class, Boolean.class, false, new Applier<Disableable, Boolean>() {
             @Override public void apply(Disableable o, Boolean v) {
                 o.setDisabled(v);
             }
         });
 
-        applier("align", Container.class, UiAlign.class, new Applier<Container, UiAlign>() {
+        applier("align", Container.class, UiAlign.class, UiAlign.center, new Applier<Container, UiAlign>() {
             @Override public void apply(Container o, UiAlign v) {
                 o.align(v.value);
             }
@@ -312,41 +394,58 @@ public class Toolkit {
                 o.background(v);
             }
         });
-        applier("clip", Container.class, Boolean.class, new Applier<Container, Boolean>() {
+        applier("clip", Container.class, Boolean.class, false, new Applier<Container, Boolean>() {
             @Override public void apply(Container o, Boolean v) {
                 o.setClip(v);
             }
         });
 
-        applier("min", ProgressBar.class, Float.class, new Applier<ProgressBar, Float>() {
+        applier("min", ProgressBar.class, Float.class, 0f, new Applier<ProgressBar, Float>() {
             @Override public void apply(ProgressBar o, Float v) {
                 o.setRange(v, o.getMaxValue());
             }
         });
-        applier("max", ProgressBar.class, Float.class, new Applier<ProgressBar, Float>() {
+        applier("max", ProgressBar.class, Float.class, 100f, new Applier<ProgressBar, Float>() {
             @Override public void apply(ProgressBar o, Float v) {
                 o.setRange(o.getMinValue(), v);
             }
         });
-        applier("step", ProgressBar.class, Float.class, new Applier<ProgressBar, Float>() {
+        applier("step", ProgressBar.class, Float.class, 1f, new Applier<ProgressBar, Float>() {
             @Override public void apply(ProgressBar o, Float v) {
                 o.setStepSize(v);
             }
         });
         applier("style", ProgressBar.class, ProgressBar.ProgressBarStyle.class, new Applier<ProgressBar, ProgressBar.ProgressBarStyle>() {
+            @Override protected ProgressBar.ProgressBarStyle getDefaultValue(ProgressBar o, Skin skin) {
+                return skin.get(ProgressBar.ProgressBarStyle.class);
+            }
             @Override public void apply(ProgressBar o, ProgressBar.ProgressBarStyle v) {
                 o.setStyle(v);
             }
         });
-        applier("value", ProgressBar.class, Float.class, new Applier<ProgressBar, Float>() {
+        applier("value", ProgressBar.class, Float.class, 0f, new Applier<ProgressBar, Float>() {
             @Override public void apply(ProgressBar o, Float v) {
                 o.setValue(v);
+            }
+        });
+
+        applier("style", ScrollPane.class, ScrollPane.ScrollPaneStyle.class, new Applier<ScrollPane, ScrollPane.ScrollPaneStyle>() {
+            @Override protected ScrollPane.ScrollPaneStyle getDefaultValue(ScrollPane o, Skin skin) {
+                return skin.get(ScrollPane.ScrollPaneStyle.class);
+            }
+            @Override public void apply(ScrollPane o, ScrollPane.ScrollPaneStyle v) {
+                o.setStyle(v);
             }
         });
 
         applier("background", Table.class, Drawable.class, new Applier<Table, Drawable>() {
             @Override public void apply(Table o, Drawable v) {
                 o.setBackground(v);
+            }
+        });
+        applier("align", Table.class, UiAlign.class, UiAlign.center, new Applier<Table, UiAlign>() {
+            @Override public void apply(Table o, UiAlign v) {
+                o.align(v.value);
             }
         });
 
@@ -360,7 +459,7 @@ public class Toolkit {
                 return new Label(resources.get("text", String.class), resources.get("style", Label.LabelStyle.class));
             }
         });
-        instantiator("textButton", TextButton.class, new Instantiator<TextButton>() {
+        instantiator("text-button", TextButton.class, new Instantiator<TextButton>() {
             {
                 require("text", String.class);
                 require("style", TextButton.TextButtonStyle.class);
@@ -431,6 +530,34 @@ public class Toolkit {
                 );
             }
         });
+
+        instantiator("scroll-pane", ScrollPane.class, new Instantiator<ScrollPane>() {
+            @Override public ScrollPane newInstance(Resources resources) {
+                return new ScrollPane(value.has("widget") ? (Actor) instantiate(value.get("widget")) : null);
+            }
+        });
+    }
+
+    public static ObjectMap<String, Applier> getAppliers(Object o) {
+        return getAppliers(o.getClass());
+    }
+
+    public static ObjectMap<String, Applier> getAppliers(Class type) {
+        ObjectMap<String, Applier> result = new ObjectMap<String, Applier>();
+        while (type != null) {
+            ObjectMap<String, Applier> typeAppliers = appliers.get(type);
+            if (typeAppliers != null) {
+                result.putAll(typeAppliers);
+            }
+            for (Class inf : type.getInterfaces()) {
+                ObjectMap<String, Applier> interfaceAppliers = appliers.get(inf);
+                if (interfaceAppliers != null) {
+                    result.putAll(interfaceAppliers);
+                }
+            }
+            type = type.getSuperclass();
+        }
+        return result;
     }
 
     static void inject(ObjectMap<Object, ObjectMap<String, Object>> fill, Object o, JsonValue v, Skin s) {
@@ -547,8 +674,13 @@ public class Toolkit {
     }
 
     public static <A, T> void applier(String key, Class<A> objectType, Class<T> valueType, Applier<A, T> applier) {
+        applier(key, objectType, valueType, null, applier);
+    }
+
+    public static <A, T> void applier(String key, Class<A> objectType, Class<T> valueType, T defaultValue, Applier<A, T> applier) {
         applier.objectClass = objectType;
         applier.valueClass = valueType;
+        applier.defaultValue = defaultValue;
         ObjectMap<String, Applier> m = appliers.get(objectType);
         if (m == null) {
             m = new ObjectMap<String, Applier>();
@@ -576,4 +708,7 @@ public class Toolkit {
         tags.put(tag, objectType);
     }
 
+    public static Applier<?, ?> applier(Class type, String key) {
+        return getAppliers(type).get(key);
+    }
 }

@@ -69,6 +69,16 @@ public class UiLayout {
         return (T) actor;
     }
 
+    @SuppressWarnings("unchecked")
+    public <T> T find(String name) {
+        if (actor instanceof Group) {
+            return (T) ((Group) actor).findActor(name);
+        } else if (name.equals(actor.getName()))
+            return (T) actor;
+        else
+            return null;
+    }
+
     public Actor findActor(Group group, String name) {
         Array<Actor> children = group.getChildren();
         for (int i = 0, n = children.size; i < n; i++) {

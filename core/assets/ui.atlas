@@ -1,12 +1,12 @@
 
 ui.png
-size: 286,296
+size: 296,312
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
 button-down
   rotate: false
-  xy: 2, 9
+  xy: 260, 283
   size: 13, 13
   split: 6, 6, 6, 6
   pad: 4, 4, 4, 4
@@ -15,7 +15,7 @@ button-down
   index: -1
 button-over
   rotate: false
-  xy: 18, 25
+  xy: 276, 299
   size: 13, 13
   split: 6, 6, 6, 6
   pad: 4, 4, 4, 4
@@ -24,11 +24,25 @@ button-over
   index: -1
 button-up
   rotate: false
-  xy: 260, 267
+  xy: 2, 9
   size: 13, 13
   split: 6, 6, 6, 6
   pad: 4, 4, 4, 4
   orig: 13, 13
+  offset: 0, 0
+  index: -1
+checkbox-off
+  rotate: false
+  xy: 2, 40
+  size: 14, 14
+  orig: 14, 14
+  offset: 0, 0
+  index: -1
+checkbox-on
+  rotate: false
+  xy: 260, 298
+  size: 14, 14
+  orig: 14, 14
   offset: 0, 0
   index: -1
 minus
@@ -40,14 +54,39 @@ minus
   index: -1
 plus
   rotate: false
-  xy: 260, 282
+  xy: 18, 40
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
+text-field-background
+  rotate: false
+  xy: 34, 46
+  size: 8, 8
+  split: 3, 3, 3, 3
+  pad: 0, 0, 0, 0
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+text-field-cursor
+  rotate: false
+  xy: 18, 25
+  size: 1, 1
+  orig: 1, 1
+  offset: 0, 0
+  index: -1
+text-field-selection
+  rotate: false
+  xy: 260, 273
+  size: 8, 8
+  split: 3, 3, 3, 3
+  pad: 0, 0, 0, 0
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
 tree-background
   rotate: false
-  xy: 2, 2
+  xy: 291, 307
   size: 5, 5
   split: 2, 2, 2, 2
   pad: 0, 0, 0, 0
@@ -56,7 +95,7 @@ tree-background
   index: -1
 tree-over
   rotate: false
-  xy: 33, 33
+  xy: 2, 2
   size: 5, 5
   split: 2, 2, 2, 2
   pad: 0, 0, 0, 0
@@ -65,7 +104,7 @@ tree-over
   index: -1
 tree-selection
   rotate: false
-  xy: 260, 260
+  xy: 44, 49
   size: 5, 5
   split: 2, 2, 2, 2
   pad: 0, 0, 0, 0
@@ -74,14 +113,14 @@ tree-selection
   index: -1
 ubuntu-light-16
   rotate: false
-  xy: 2, 40
+  xy: 2, 56
   size: 256, 256
   orig: 256, 256
   offset: 0, 0
   index: -1
 workspace-background
   rotate: false
-  xy: 276, 286
+  xy: 18, 28
   size: 10, 10
   orig: 10, 10
   offset: 0, 0

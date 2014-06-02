@@ -1,6 +1,7 @@
 {
     com.badlogic.gdx.graphics.Color: {
         textDefault: {hex: ccccccff},
+        textActive: {hex: eeeeeeff},
         textButton: {hex: ccccccff},
         textDisabled: {hex: 666666ff},
         textHint: {hex: 777777ff}
@@ -29,6 +30,21 @@
             over: tree-over,
             selection: tree-selection,
             background: tree-background
+        }
+    },
+    com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle: {
+        default: {
+            font: default,
+            fontColor: textDefault,
+            focusedFontColor: textActive,
+            cursor: text-field-cursor,
+            selection: text-field-selection,
+            background: text-field-background
+        }
+    },
+    com.badlogic.gdx.scenes.scene2d.ui.CheckBox$CheckBoxStyle: {
+        default: {
+            font: default, checkboxOn: checkbox-on, checkboxOff: checkbox-off
         }
     }
 }
