@@ -1,6 +1,7 @@
 {
 "type": "vertical-list",
 "name": "root",
+"transform": false,
 "fillParent": true,
 "elements": [
 	{
@@ -11,12 +12,16 @@
 		"expandX": true,
 		"widget": {
 			"type": "horizontal-list",
+			"align": "left",
 			"name": "top-panel",
+			"transform": false,
 			"elements": [
 				{
 					"maxHeight": 25,
+					"minWidth": 100,
 					"widget": {
 						"type": "text-button",
+						"fillParent": false,
 						"name": "open",
 						"text": "Open",
 						"style": "default",
@@ -25,6 +30,7 @@
 				},
 				{
 					"maxHeight": 25,
+					"minWidth": 100,
 					"widget": {
 						"type": "text-button",
 						"name": "save",
@@ -77,6 +83,7 @@
 									"type": "container",
 									"align": "top",
 									"name": "tree",
+									"clip": false,
 									"fillX": true,
 									"fillY": false
 								}
