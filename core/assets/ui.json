@@ -40,6 +40,14 @@
             cursor: text-field-cursor,
             selection: text-field-selection,
             background: text-field-background
+        },
+        required: {
+            font: default,
+            fontColor: textDefault,
+            focusedFontColor: textActive,
+            cursor: text-field-cursor,
+            selection: text-field-selection,
+            background: text-field-background-required
         }
     },
     com.badlogic.gdx.scenes.scene2d.ui.CheckBox$CheckBoxStyle: {
@@ -59,6 +67,13 @@
             fontColorUnselected: textDefault,
             selection: text-field-selection,
             background: text-field-background
+        },
+        required: {
+            font: default,
+            fontColorSelected: textActive,
+            fontColorUnselected: textDefault,
+            selection: text-field-selection,
+            background: text-field-background-required
         }
     },
     com.badlogic.gdx.scenes.scene2d.ui.SelectBox$SelectBoxStyle: {
@@ -68,6 +83,13 @@
             background: text-field-background,
             scrollStyle: default,
             listStyle: default
+        },
+        required: {
+            font: default,
+            fontColor: textDefault,
+            background: text-field-background-required,
+            scrollStyle: default,
+            listStyle: required
         }
     }
 }

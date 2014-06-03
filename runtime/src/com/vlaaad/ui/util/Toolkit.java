@@ -434,12 +434,11 @@ public class Toolkit {
         });
         instantiator("text-button", TextButton.class, new Instantiator<TextButton>() {
             {
-                require("text", String.class);
                 require("style", TextButton.TextButtonStyle.class);
             }
 
             @Override public TextButton newInstance(Resources resources) {
-                return new TextButton(resources.get("text", String.class), resources.get("style", TextButton.TextButtonStyle.class));
+                return new TextButton(resources.get("text", ""), resources.get("style", TextButton.TextButtonStyle.class));
             }
         });
         instantiator("container", Container.class, new Instantiator<Container>() {

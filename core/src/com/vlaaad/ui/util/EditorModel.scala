@@ -1,13 +1,14 @@
 package com.vlaaad.ui.util
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
-import com.badlogic.gdx.utils.JsonWriter
-import com.badlogic.gdx.utils.ObjectMap
+import com.badlogic.gdx.utils.{ObjectSet, JsonWriter, ObjectMap}
 
 /**
  * Created 01.06.14 by vlaaad
  */
 sealed abstract class EditorModel[A](val obj: A, val params: ObjectMap[String, AnyRef]) {
+  val requirements = new ObjectSet[String]()
+
   def dump(writer: JsonWriter, skin: Skin): Unit = ()
 }
 
@@ -23,7 +24,7 @@ class Wrapper[A, That](obj: A,
   extends EditorModel[A](obj, params) {
   override def dump(writer: JsonWriter, skin: Skin): Unit = {
     Option(wrapped) match {
-      case Some(v)=>
+      case Some(v) =>
         writer.name("widget")
         EditorToolkit.dump(writer, v, skin)
       case None =>

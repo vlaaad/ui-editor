@@ -119,7 +119,7 @@ class EditorState(val assets: AssetManager) extends AppState {
     val node = new Tree.Node(t)
     node.setObject(model)
     model match {
-      case leaf: Element[_] => println(s"is leaf! $leaf");
+      case leaf: Element[_] =>
       case wrapper: Wrapper[_, _] =>
         Option(wrapper.wrapped).foreach(v => {
           node.add(createNode(v))
@@ -152,9 +152,10 @@ class EditorState(val assets: AssetManager) extends AppState {
       val label = new Label(v.key, editorSkin)
       label.setAlignment(Align.right)
       table.add(label).align(Align.right).padRight(2)
-      val input = EditorToolkit.createInput[AnyRef](model.params.get(v.key), v.value.valueClass.asInstanceOf[Class[AnyRef]], layoutSkin, editorSkin)
+      val required = model.requirements.contains(v.key)
+      val input = EditorToolkit.createInput[AnyRef](required, model.params.get(v.key), v.value.valueClass.asInstanceOf[Class[AnyRef]], layoutSkin, editorSkin)
       initInput(model, v.key, input)
-      table.add(input.getActor).row()
+      table.add(input.getActor).padBottom(1).row()
     })
     paramsContainer.setWidget(table)
   }

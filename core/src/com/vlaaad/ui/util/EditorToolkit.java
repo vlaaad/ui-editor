@@ -13,10 +13,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.tablelayout.Cell;
-import com.vlaaad.ui.util.inputs.EditorInput;
-import com.vlaaad.ui.util.inputs.EmptyInput;
-import com.vlaaad.ui.util.inputs.EnumInput;
-import com.vlaaad.ui.util.inputs.TextInput;
+import com.vlaaad.ui.util.inputs.*;
 import com.vlaaad.ui.util.inputs.factories.EditorInputFactory;
 import com.vlaaad.ui.util.models.CollectionFactory;
 import com.vlaaad.ui.util.models.EditorModelFactory;
@@ -51,26 +48,26 @@ public class EditorToolkit {
 
     static {
         input(Float.class, new EditorInputFactory<Float>() {
-            @Override public EditorInput<Float> create(final Float initialValue, Skin layoutSkin, final Skin editorSkin) {
-                return new TextInput<Float>(initialValue, editorSkin) {
+            @Override public EditorInput<Float> create(boolean required, final Float initialValue, Skin layoutSkin, final Skin editorSkin) {
+                return new TextInput<Float>(required, initialValue, editorSkin) {
                     @Override protected Float toValue(String text) {
-                        return Float.valueOf(text);
+                        return text.equals("-") ? 0 : Float.valueOf(text);
                     }
                 };
             }
         });
         input(Integer.class, new EditorInputFactory<Integer>() {
-            @Override public EditorInput<Integer> create(final Integer initialValue, Skin layoutSkin, final Skin editorSkin) {
-                return new TextInput<Integer>(initialValue, editorSkin) {
+            @Override public EditorInput<Integer> create(boolean required, final Integer initialValue, Skin layoutSkin, final Skin editorSkin) {
+                return new TextInput<Integer>(required, initialValue, editorSkin) {
                     @Override protected Integer toValue(String text) {
-                        return Integer.valueOf(text);
+                        return text.equals("-") ? 0 : Integer.valueOf(text);
                     }
                 };
             }
         });
         input(String.class, new EditorInputFactory<String>() {
-            @Override public EditorInput<String> create(final String initialValue, Skin layoutSkin, final Skin editorSkin) {
-                return new TextInput<String>(initialValue, editorSkin) {
+            @Override public EditorInput<String> create(boolean required, final String initialValue, Skin layoutSkin, final Skin editorSkin) {
+                return new TextInput<String>(required, initialValue, editorSkin) {
                     @Override protected String toValue(String text) {
                         return text;
                     }
@@ -78,7 +75,7 @@ public class EditorToolkit {
             }
         });
         input(Boolean.class, new EditorInputFactory<Boolean>() {
-            @Override public EditorInput<Boolean> create(final Boolean initialValue, Skin layoutSkin, final Skin editorSkin) {
+            @Override public EditorInput<Boolean> create(boolean required, final Boolean initialValue, Skin layoutSkin, final Skin editorSkin) {
                 return new EditorInput<Boolean>(initialValue) {
                     private final CheckBox checkBox = new CheckBox("", editorSkin);
 
@@ -108,13 +105,17 @@ public class EditorToolkit {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> EditorInput<T> createInput(T initialValue, Class<T> type, Skin layoutSkin, Skin editorSkin) {
+    public static <T> EditorInput<T> createInput(boolean required, T initialValue, Class<T> type, Skin layoutSkin, Skin editorSkin) {
         if (type.isEnum()) {
-            return new EnumInput<T>(type.getEnumConstants(), initialValue, editorSkin);
+            return new EnumInput<T>(required, type.getEnumConstants(), initialValue, editorSkin);
         }
         EditorInputFactory<T> factory = inputs.get(type);
         if (factory != null) {
-            return factory.create(initialValue, layoutSkin, editorSkin);
+            return factory.create(required, initialValue, layoutSkin, editorSkin);
+        }
+        ObjectMap<String, T> resources = layoutSkin.getAll(type);
+        if (resources != null) {
+            return new SkinInput<T>(required, resources, initialValue, editorSkin);
         }
         return new EmptyInput<T>(initialValue, editorSkin);
     }

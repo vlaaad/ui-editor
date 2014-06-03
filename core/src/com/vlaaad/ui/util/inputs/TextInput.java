@@ -10,17 +10,21 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 public abstract class TextInput<T> extends EditorInput<T> {
 
     private final TextField textField;
+    private final boolean required;
+    private String prev = "";
 
-    protected TextInput(T initialValue, Skin editorSkin) {
+    protected TextInput(boolean required, T initialValue, Skin editorSkin) {
         super(initialValue);
-        textField = new TextField(dispatcher.getState() == null ? "" : String.valueOf(dispatcher.getState()), editorSkin);
-        textField.setTextFieldFilter(new TextField.TextFieldFilter() {
-            @Override public boolean acceptChar(TextField textField, char c) {
-                return acceptInput(textField.getText(), c);
-            }
-        });
+        this.required = required;
+        textField = new TextField(dispatcher.getState() == null ? "" : String.valueOf(dispatcher.getState()), editorSkin, required ? "required" : "default");
+
         textField.setTextFieldListener(new TextField.TextFieldListener() {
             @Override public void keyTyped(TextField textField, char c) {
+                if (!acceptInput(textField.getText())) {
+                    textField.setText(prev);
+                } else {
+                    prev = textField.getText();
+                }
                 if (textField.getText().length() == 0) {
                     dispatcher.setState(null);
                 } else {
@@ -30,9 +34,13 @@ public abstract class TextInput<T> extends EditorInput<T> {
         });
     }
 
-    protected boolean acceptInput(String currentText, char c) {
+    protected boolean acceptInput(String currentText) {
+        if (required && currentText.length() == 0)
+            return false;
+        if (currentText.length() == 0)
+            return true;
         try {
-            toValue(currentText + c);
+            toValue(currentText);
             return true;
         } catch (Exception e) {
             return false;

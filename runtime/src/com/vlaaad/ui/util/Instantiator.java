@@ -8,7 +8,8 @@ import com.badlogic.gdx.utils.ObjectMap;
  * Created 31.05.14 by vlaaad
  */
 public abstract class Instantiator<T> {
-    final ObjectMap<String, Class> requirements = new ObjectMap<String, Class>();
+    public final ObjectMap<String, Class> requirements = new ObjectMap<String, Class>();
+
     JsonValue value;
     Skin skin;
     ObjectMap<Object, ObjectMap<String, Object>> params;

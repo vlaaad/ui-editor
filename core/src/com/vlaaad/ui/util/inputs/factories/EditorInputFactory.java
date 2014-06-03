@@ -7,5 +7,5 @@ import com.vlaaad.ui.util.inputs.EditorInput;
  * Created 02.06.14 by vlaaad
  */
 public abstract class EditorInputFactory<T> {
-    public abstract EditorInput<T> create(T initialValue, Skin layoutSkin, Skin editorSkin);
+    public abstract EditorInput<T> create(boolean required, T initialValue, Skin layoutSkin, Skin editorSkin);
 }
