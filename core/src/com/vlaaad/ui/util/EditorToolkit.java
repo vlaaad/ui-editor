@@ -2,10 +2,7 @@ package com.vlaaad.ui.util;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.JsonReader;
@@ -42,6 +39,11 @@ public class EditorToolkit {
         factory(Table.class, new CollectionFactory<Table>() {
             @Override protected Iterable<?> getElements(Table table) {
                 return table.getCells();
+            }
+        });
+        factory(ScrollPane.class, new WrapperFactory<ScrollPane>() {
+            @Override protected Object getWrapped(ScrollPane scrollPane) {
+                return scrollPane.getWidget();
             }
         });
     }

@@ -14,7 +14,7 @@ public abstract class Applier<Obj, Val> {
         apply(o, getDefaultValue(o, skin));
     }
 
-    protected Val getDefaultValue(Obj o, Skin skin) {
+    public Val getDefaultValue(Obj o, Skin skin) {
         return defaultValue;
     }
 

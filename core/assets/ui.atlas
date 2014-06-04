@@ -45,6 +45,20 @@ checkbox-on
   orig: 14, 14
   offset: 0, 0
   index: -1
+dragged-target-background
+  rotate: false
+  xy: 18, 25
+  size: 1, 1
+  orig: 1, 1
+  offset: 0, 0
+  index: -1
+invalid-target-background
+  rotate: false
+  xy: 30, 37
+  size: 1, 1
+  orig: 1, 1
+  offset: 0, 0
+  index: -1
 minus
   rotate: false
   xy: 2, 24
@@ -79,7 +93,7 @@ text-field-background-required
   index: -1
 text-field-cursor
   rotate: false
-  xy: 18, 25
+  xy: 34, 43
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
@@ -125,6 +139,13 @@ ubuntu-light-16
   xy: 2, 56
   size: 256, 256
   orig: 256, 256
+  offset: 0, 0
+  index: -1
+valid-target-background
+  rotate: false
+  xy: 270, 280
+  size: 1, 1
+  orig: 1, 1
   offset: 0, 0
   index: -1
 workspace-background

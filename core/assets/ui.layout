@@ -64,7 +64,7 @@
 					}
 				},
 				{
-					"minWidth": 200,
+					"minWidth": 400,
 					"fillX": true,
 					"fillY": true,
 					"expandX": false,
@@ -74,18 +74,24 @@
 						"name": "panel",
 						"elements": [
 							{
+								"maxWidth": 200,
 								"minWidth": 200,
 								"fillX": true,
 								"fillY": true,
 								"expandX": true,
 								"expandY": true,
 								"widget": {
-									"type": "container",
-									"align": "top",
-									"name": "tree",
-									"clip": false,
-									"fillX": true,
-									"fillY": false
+									"type": "scroll-pane",
+									"overScroll": false,
+									"cancelTouch": false,
+									"width": 200,
+									"name": "tree-pane",
+									"widget": {
+										"type": "container",
+										"name": "tree",
+										"fillX": true,
+										"fillY": true
+									}
 								}
 							},
 							{

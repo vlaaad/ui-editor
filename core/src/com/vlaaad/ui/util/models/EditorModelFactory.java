@@ -9,6 +9,7 @@ import com.vlaaad.ui.util.Toolkit;
  * Created 02.06.14 by vlaaad
  */
 public abstract class EditorModelFactory<T> {
+    @SuppressWarnings("unchecked")
     public final EditorModel<T> newInstance(T t, ObjectMap<Object, ObjectMap<String, Object>> params) {
         EditorModel<T> model = create(t, params(t, params), params);
         Instantiator<T> instantiator = (Instantiator<T>) Toolkit.instantiator(t.getClass());

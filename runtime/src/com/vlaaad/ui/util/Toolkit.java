@@ -87,7 +87,7 @@ public class Toolkit {
             }
         });
         applier("touchable", Actor.class, Touchable.class, new Applier<Actor, Touchable>() {
-            @Override protected Touchable getDefaultValue(Actor o, Skin skin) {
+            @Override public Touchable getDefaultValue(Actor o, Skin skin) {
                 if (o instanceof Button)
                     return Touchable.enabled;
                 if (o instanceof Table || o instanceof Container || o instanceof Stack || o instanceof VerticalGroup || o instanceof HorizontalGroup)
@@ -102,7 +102,7 @@ public class Toolkit {
 
         applier("transform", Group.class, Boolean.class, new Applier<Group, Boolean>() {
 
-            @Override protected Boolean getDefaultValue(Group o, Skin skin) {
+            @Override public Boolean getDefaultValue(Group o, Skin skin) {
                 return !(o instanceof Container || o instanceof Stack || o instanceof Table);
             }
 
@@ -290,7 +290,7 @@ public class Toolkit {
             }
         });
         applier("style", Label.class, Label.LabelStyle.class, new Applier<Label, Label.LabelStyle>() {
-            @Override protected Label.LabelStyle getDefaultValue(Label o, Skin skin) {
+            @Override public Label.LabelStyle getDefaultValue(Label o, Skin skin) {
                 return skin.get(Label.LabelStyle.class);
             }
 
@@ -310,7 +310,7 @@ public class Toolkit {
             }
         });
         applier("style", TextButton.class, TextButton.TextButtonStyle.class, new Applier<TextButton, TextButton.TextButtonStyle>() {
-            @Override protected TextButton.TextButtonStyle getDefaultValue(TextButton o, Skin skin) {
+            @Override public TextButton.TextButtonStyle getDefaultValue(TextButton o, Skin skin) {
                 return skin.get(TextButton.TextButtonStyle.class);
             }
 
@@ -387,7 +387,7 @@ public class Toolkit {
             }
         });
         applier("style", ProgressBar.class, ProgressBar.ProgressBarStyle.class, new Applier<ProgressBar, ProgressBar.ProgressBarStyle>() {
-            @Override protected ProgressBar.ProgressBarStyle getDefaultValue(ProgressBar o, Skin skin) {
+            @Override public ProgressBar.ProgressBarStyle getDefaultValue(ProgressBar o, Skin skin) {
                 return skin.get(ProgressBar.ProgressBarStyle.class);
             }
 
@@ -402,7 +402,7 @@ public class Toolkit {
         });
 
         applier("style", ScrollPane.class, ScrollPane.ScrollPaneStyle.class, new Applier<ScrollPane, ScrollPane.ScrollPaneStyle>() {
-            @Override protected ScrollPane.ScrollPaneStyle getDefaultValue(ScrollPane o, Skin skin) {
+            @Override public ScrollPane.ScrollPaneStyle getDefaultValue(ScrollPane o, Skin skin) {
                 return skin.get(ScrollPane.ScrollPaneStyle.class);
             }
 
@@ -419,6 +419,16 @@ public class Toolkit {
         applier("align", Table.class, UiAlign.class, UiAlign.center, new Applier<Table, UiAlign>() {
             @Override public void apply(Table o, UiAlign v) {
                 o.align(v.value);
+            }
+        });
+        applier("overScroll", ScrollPane.class, Boolean.class, true, new Applier<ScrollPane, Boolean>() {
+            @Override public void apply(ScrollPane o, Boolean v) {
+                o.setOverscroll(v, v);
+            }
+        });
+        applier("cancelTouch", ScrollPane.class, Boolean.class, true, new Applier<ScrollPane, Boolean>() {
+            @Override public void apply(ScrollPane o, Boolean v) {
+                o.setCancelTouchFocus(v);
             }
         });
 
