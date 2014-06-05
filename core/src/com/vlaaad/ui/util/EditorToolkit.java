@@ -31,19 +31,42 @@ public class EditorToolkit {
     static {
         factory(Object.class, new ElementFactory<Object>());
         factory(TextButton.class, new ElementFactory<TextButton>());
-        factory(Cell.class, new WrapperFactory<Cell>() {
-            @Override protected Object getWrapped(Cell cell) {
-                return cell.getWidget();
+        factory(Cell.class, new WrapperFactory<Cell, Actor>(Actor.class) {
+            @Override protected Actor getWrapped(Cell cell) {
+                return (Actor) cell.getWidget();
             }
+            @SuppressWarnings("unchecked") @Override protected void remove(Cell cell, Actor widget) {
+                cell.setWidget(null);
+            }
+            @SuppressWarnings("unchecked") @Override protected void setWidget(Cell cell, Actor widget) {
+                cell.setWidget(widget);
+            }
+
         });
-        factory(Table.class, new CollectionFactory<Table>() {
-            @Override protected Iterable<?> getElements(Table table) {
+        factory(Table.class, new CollectionFactory<Table, Cell>(Cell.class) {
+            @Override protected Iterable<Cell> getElements(Table table) {
                 return table.getCells();
             }
+
+            @Override protected void remove(Table table, Cell element) {
+                table.getCells().remove(element);
+                table.invalidate();
+            }
+
+            @Override protected void add(Table table, Cell element) {
+                table.getCells().add(element);
+                table.invalidate();
+            }
         });
-        factory(ScrollPane.class, new WrapperFactory<ScrollPane>() {
-            @Override protected Object getWrapped(ScrollPane scrollPane) {
+        factory(ScrollPane.class, new WrapperFactory<ScrollPane, Actor>(Actor.class) {
+            @Override protected Actor getWrapped(ScrollPane scrollPane) {
                 return scrollPane.getWidget();
+            }
+            @Override protected void remove(ScrollPane scrollPane, Actor widget) {
+                scrollPane.setWidget(null);
+            }
+            @Override protected void setWidget(ScrollPane scrollPane, Actor widget) {
+                scrollPane.setWidget(widget);
             }
         });
     }

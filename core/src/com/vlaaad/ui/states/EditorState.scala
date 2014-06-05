@@ -6,23 +6,21 @@ import com.vlaaad.ui.UiLayout
 import com.badlogic.gdx.scenes.scene2d.ui._
 import com.badlogic.gdx.scenes.scene2d.utils._
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent
-import com.badlogic.gdx.scenes.scene2d.{Touchable, InputEvent, Group, Actor}
+import com.badlogic.gdx.scenes.scene2d._
 import javax.swing.JFileChooser
 import java.io.File
 import javax.swing.filechooser.FileFilter
 import com.badlogic.gdx.files.FileHandle
-import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.{Input, Gdx}
 import com.badlogic.gdx.utils.ObjectMap
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.graphics.{Color, GL20}
 import com.vlaaad.ui.view.WorkSpace
 import com.vlaaad.ui.util._
 import collection.convert.wrapAsScala._
 import com.vlaaad.ui.util.inputs.EditorInput
 import com.vlaaad.ui.util.IStateDispatcher.Listener
-import scala.Some
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.{Source, Payload}
+import scala.Some
 
 
 /** Created 29.05.14 by vlaaad */
@@ -39,10 +37,6 @@ class EditorState(val assets: AssetManager) extends AppState {
   val renderer = new ShapeRenderer()
   var model: EditorModel[_] = _
   var currentFile: FileHandle = _
-  val tmp1 = new Vector2()
-  val tmp2 = new Vector2()
-  val tmp3 = new Vector2()
-  val tmp4 = new Vector2()
 
   override protected def onEntered(): Unit = {
     val layout = assets.get("ui.layout", classOf[UiLayout])
@@ -81,6 +75,25 @@ class EditorState(val assets: AssetManager) extends AppState {
         currentFile.writeString(EditorToolkit.dump(model, layoutSkin), false)
       }
     })
+    stage.addListener(new InputListener {
+
+      override def keyUp(event: InputEvent, keycode: Int): Boolean = {
+        if (keycode == Input.Keys.FORWARD_DEL) {
+          Option(tree).map(_.getSelection.getLastSelected).filter(v => v != null && v.getParent != null).foreach(v => {
+            val parent = v.getParent.getObject.asInstanceOf[EditorModel[_]]
+            val model = v.getObject.asInstanceOf[EditorModel[AnyRef]]
+            withRebuildTree {
+              parent match {
+                case c: Collection[_, _] => c.asInstanceOf[Collection[AnyRef, AnyRef]].remove(model)
+                case w: Wrapper[_, _] => w.asInstanceOf[Wrapper[AnyRef, AnyRef]].remove(model)
+                case _ =>
+              }
+            }
+          })
+        }
+        true
+      }
+    })
   }
 
   def open(file: FileHandle) = {
@@ -106,26 +119,113 @@ class EditorState(val assets: AssetManager) extends AppState {
       }
     })
     treeContainer.setWidget(tree)
+    initDragAndDrop(tree)
+  }
+
+  def initDragAndDrop(tree: Tree): Unit = {
+    val dnd = new DragAndDrop()
+    for (node <- tree.getNodes)
+      initDragAndDrop(node, dnd)
+  }
+
+  def initDragAndDrop(node: Tree.Node, dragAndDrop: DragAndDrop): Unit = {
+    for (child <- node.getChildren) initDragAndDrop(child, dragAndDrop)
+
+    val model = node.getObject.asInstanceOf[EditorModel[_]]
+
+    dragAndDrop.addSource(new DragAndDrop.Source(node.getActor) {
+
+      override def dragStart(event: InputEvent, x: Float, y: Float, pointer: Int): Payload = {
+        for (listener <- node.getActor.getCaptureListeners) {
+          stage.cancelTouchFocus(listener, node.getActor)
+        }
+        def createStack(back: String) = {
+          val stack = new Stack
+          stack.add(new Image(editorSkin, back))
+          stack.add(createView(model))
+          stack.pack()
+          stack
+        }
+        val payload = new Payload()
+        payload.setDragActor(createStack("dragged-target-background"))
+        payload.setInvalidDragActor(createStack("invalid-target-background"))
+        payload.setValidDragActor(createStack("valid-target-background"))
+        payload.setObject(node)
+        payload
+      }
+
+    })
+    dragAndDrop.addTarget(new DragAndDrop.Target(node.getActor) {
+
+      override def drop(source: Source, payload: Payload, x: Float, y: Float, pointer: Int): Unit = {
+        println("dropped!")
+        val from = payload.getObject.asInstanceOf[Tree.Node]
+        val fromModel = from.getObject.asInstanceOf[EditorModel[AnyRef]]
+        val parentModel = from.getParent.getObject.asInstanceOf[EditorModel[AnyRef]]
+        withRebuildTree {
+          parentModel match {
+            case c: Collection[_, _] => c.asInstanceOf[Collection[AnyRef, AnyRef]].remove(fromModel)
+            case w: Wrapper[_, _] => w.asInstanceOf[Wrapper[AnyRef, AnyRef]].remove(fromModel)
+            case _ =>
+          }
+          model match {
+            case c: Collection[_, _] =>
+              c.asInstanceOf[Collection[AnyRef, AnyRef]].add(fromModel)
+            case w: Wrapper[_, _] =>
+              w.asInstanceOf[Wrapper[AnyRef, AnyRef]].setWidget(fromModel)
+            case _ =>
+          }
+        }
+      }
+
+      override def drag(source: Source, payload: Payload, x: Float, y: Float, pointer: Int): Boolean = {
+        val from = payload.getObject.asInstanceOf[Tree.Node]
+        val fromModel = from.getObject.asInstanceOf[EditorModel[_]]
+        val parentModel = from.getParent.getObject.asInstanceOf[EditorModel[_]]
+        if (parentModel == null) {
+          false
+        } else {
+          model match {
+            case c: Collection[_, _] => c.accepts(fromModel)
+            case w: Wrapper[_, _] => w.accepts(fromModel)
+            case _ => false
+          }
+        }
+      }
+    })
+  }
+
+  def withRebuildTree[R](block: => R): R = {
+    val arr = new com.badlogic.gdx.utils.Array[AnyRef]()
+    tree.findExpandedObjects(arr)
+    val returned = block
+    tree.clearChildren()
+    tree.add(createNode(model))
+    tree.expandAll()
+    tree.restoreExpandedObjects(arr)
+    initDragAndDrop(tree)
+    returned
   }
 
   def buildModel(obj: Object, params: ObjectMap[Object, ObjectMap[String, Object]]): EditorModel[_] = {
     EditorToolkit.createModel(obj, params)
   }
 
-  def createNode(model: EditorModel[_]): Tree.Node = {
-    def createView() = {
-      val t = new Table(editorSkin)
-      t.defaults().padTop(-5).padBottom(-4)
-      t.setTouchable(Touchable.enabled)
-      model.obj match {
-        case a: Actor =>
-          t.add(model.obj.toString).padRight(2).padLeft(2)
-          t.add(model.obj.getClass.getSimpleName, "hint")
-        case any => t.add(any.getClass.getSimpleName, "hint")
-      }
-      t
+  def createView(model: EditorModel[_]) = {
+    val t = new Table(editorSkin)
+    t.defaults().padTop(-5).padBottom(-4)
+    t.setTouchable(Touchable.enabled)
+    model.obj match {
+      case a: Actor =>
+        t.add(model.obj.toString).padRight(2).padLeft(2)
+        t.add(model.obj.getClass.getSimpleName, "hint")
+      case any => t.add(any.getClass.getSimpleName, "hint")
     }
-    val node = new Tree.Node(createView())
+    t
+  }
+
+  def createNode(model: EditorModel[_]): Tree.Node = {
+    val node = new Tree.Node(createView(model))
     node.setObject(model)
     model match {
       case leaf: Element[_] =>
@@ -138,32 +238,6 @@ class EditorState(val assets: AssetManager) extends AppState {
           node.add(createNode(v))
         })
     }
-    val dnd = new DragAndDrop()
-    dnd.addSource(new DragAndDrop.Source(node.getActor) {
-      override def dragStart(event: InputEvent, x: Float, y: Float, pointer: Int): Payload = {
-        def createStack(back: String) = {
-          val stack = new Stack
-          stack.add(new Image(editorSkin, back))
-          stack.add(createView())
-          stack.pack()
-          stack
-        }
-        val payload = new Payload()
-        payload.setDragActor(createStack("dragged-target-background"))
-        payload.setInvalidDragActor(createStack("invalid-target-background"))
-        payload.setValidDragActor(createStack("valid-target-background"))
-        payload.setObject(model)
-        payload
-      }
-
-    })
-    dnd.addTarget(new DragAndDrop.Target(node.getActor) {
-      override def drop(source: Source, payload: Payload, x: Float, y: Float, pointer: Int): Unit = {
-        println("dropped!")
-      }
-
-      override def drag(source: Source, payload: Payload, x: Float, y: Float, pointer: Int): Boolean = true
-    })
     node
   }
 
@@ -226,63 +300,15 @@ class EditorState(val assets: AssetManager) extends AppState {
     }
   }
 
-  object DebugMode extends Enumeration {
-    val all, over, selected = Value
+
+  override protected def onExited(): Unit = {
+    editorSkin.dispose()
+    Option(layoutSkin).foreach(_.dispose())
   }
 
   override protected def onRendered(): Unit = {
     if (model != null) {
-      renderer.setProjectionMatrix(stage.getBatch.getProjectionMatrix)
-      renderer.setTransformMatrix(stage.getBatch.getTransformMatrix)
-      renderer.begin(ShapeRenderer.ShapeType.Line)
-      Gdx.gl.glEnable(GL20.GL_BLEND)
-      drawDebug(model, DebugMode.all)
-      drawDebug(model, DebugMode.over)
-      drawDebug(model, DebugMode.selected)
-      Gdx.gl.glDisable(GL20.GL_BLEND)
-      renderer.end()
-    }
-  }
-
-  def drawDebug(model: EditorModel[_], mode: DebugMode.Value): Unit = {
-    val actor = model.obj
-    actor match {
-      case a: Actor =>
-        val bottomLeft = a.localToStageCoordinates(tmp1.set(0, 0))
-        val bottomRight = a.localToStageCoordinates(tmp2.set(a.getWidth, 0))
-        val topLeft = a.localToStageCoordinates(tmp3.set(0, a.getHeight))
-        val topRight = a.localToStageCoordinates(tmp4.set(a.getWidth, a.getHeight))
-        var draw = false
-        if (tree.getSelection.first() != null && model == tree.getSelection.first().getObject) {
-          renderer.setColor(Color.LIGHT_GRAY)
-          Gdx.gl.glLineWidth(1)
-          draw = mode == DebugMode.selected
-        } else if (tree.getOverNode != null && model == tree.getOverNode.getObject) {
-          renderer.setColor(Color.GRAY)
-          Gdx.gl.glLineWidth(1)
-          draw = mode == DebugMode.over
-        } else {
-          renderer.setColor(Color.BLACK)
-          Gdx.gl.glLineWidth(1)
-          draw = mode == DebugMode.all
-        }
-        if (draw) {
-          renderer.line(bottomLeft, bottomRight)
-          renderer.line(bottomLeft, topLeft)
-          renderer.line(topLeft, topRight)
-          renderer.line(bottomRight, topRight)
-          renderer.flush()
-        }
-        Gdx.gl.glLineWidth(1)
-      case _ =>
-    }
-
-    model match {
-      case w: Wrapper[_, _] =>
-        Option(w.wrapped).foreach(drawDebug(_, mode))
-      case l: Element[_] =>
-      case c: Collection[_, _] =>
-        c.elements.foreach(drawDebug(_, mode))
+      DrawHelper.drawModel(model, renderer, tree)
     }
   }
 }

@@ -19,9 +19,12 @@ class Element[A](obj: A,
 }
 
 class Wrapper[A, That](obj: A,
+                       val elementType: Class[_ <: That],
                        params: ObjectMap[String, AnyRef],
+                       val controller: WrapperController[That],
                        var wrapped: EditorModel[That])
   extends EditorModel[A](obj, params) {
+
   override def dump(writer: JsonWriter, skin: Skin): Unit = {
     Option(wrapped) match {
       case Some(v) =>
@@ -31,11 +34,40 @@ class Wrapper[A, That](obj: A,
     }
   }
 
+  def accepts(model: EditorModel[_]) = {
+    elementType.isInstance(model.obj) && model.obj != obj
+  }
+
+  def remove(model: EditorModel[That]) = {
+    wrapped = null
+    controller.remove(model.obj)
+  }
+
+  def setWidget(model: EditorModel[That]) = {
+    wrapped = model
+    controller.setWidget(model.obj)
+  }
+
   override def toString: String = s"wrapper{$obj with params $params, wrapped: $wrapped}"
+
+}
+
+trait WrapperController[W] {
+  def setWidget(widget: W)
+
+  def remove(widget: W)
+}
+
+trait CollectionController[E] {
+  def remove(element: E)
+
+  def add(element: E)
 }
 
 class Collection[A, That](obj: A,
                           params: ObjectMap[String, AnyRef],
+                          val elementType: Class[That],
+                          val controller: CollectionController[That],
                           val elements: com.badlogic.gdx.utils.Array[EditorModel[That]])
   extends EditorModel[A](obj, params) {
   override def dump(writer: JsonWriter, skin: Skin): Unit = {
@@ -44,6 +76,22 @@ class Collection[A, That](obj: A,
     elements.foreach(v => EditorToolkit.dump(writer, v, skin))
     writer.pop()
   }
+
+  def accepts(model: EditorModel[_]) = {
+    elementType.isInstance(model.obj) && model.obj != obj && !elements.contains(model.asInstanceOf[EditorModel[That]], true)
+  }
+
+  def remove(model: EditorModel[That]) = {
+    if (elements.removeValue(model, true)) controller.remove(model.obj)
+  }
+
+  def add(model: EditorModel[That]) = {
+    if (!elements.contains(model, true)) {
+      elements.add(model)
+      controller.add(model.obj)
+    }
+  }
+
 
   override def toString: String = s"collection{$obj with params $params, elements: $elements}"
 }
