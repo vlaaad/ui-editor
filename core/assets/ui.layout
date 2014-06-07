@@ -49,7 +49,8 @@
 			"name": "content",
 			"elements": [
 				{
-					"minWidth": 200,
+					"maxWidth": 250,
+					"minWidth": 250,
 					"fillX": true,
 					"fillY": true,
 					"expandY": true,

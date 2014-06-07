@@ -35,38 +35,15 @@ public class EditorToolkit {
             @Override protected Actor getWrapped(Cell cell) {
                 return (Actor) cell.getWidget();
             }
-            @SuppressWarnings("unchecked") @Override protected void remove(Cell cell, Actor widget) {
-                cell.setWidget(null);
-            }
-            @SuppressWarnings("unchecked") @Override protected void setWidget(Cell cell, Actor widget) {
-                cell.setWidget(widget);
-            }
-
         });
         factory(Table.class, new CollectionFactory<Table, Cell>(Cell.class) {
             @Override protected Iterable<Cell> getElements(Table table) {
                 return table.getCells();
             }
-
-            @Override protected void remove(Table table, Cell element) {
-                table.getCells().remove(element);
-                table.invalidate();
-            }
-
-            @Override protected void add(Table table, Cell element) {
-                table.getCells().add(element);
-                table.invalidate();
-            }
         });
         factory(ScrollPane.class, new WrapperFactory<ScrollPane, Actor>(Actor.class) {
             @Override protected Actor getWrapped(ScrollPane scrollPane) {
                 return scrollPane.getWidget();
-            }
-            @Override protected void remove(ScrollPane scrollPane, Actor widget) {
-                scrollPane.setWidget(null);
-            }
-            @Override protected void setWidget(ScrollPane scrollPane, Actor widget) {
-                scrollPane.setWidget(widget);
             }
         });
     }
@@ -102,12 +79,14 @@ public class EditorToolkit {
         input(Boolean.class, new EditorInputFactory<Boolean>() {
             @Override public EditorInput<Boolean> create(boolean required, final Boolean initialValue, Skin layoutSkin, final Skin editorSkin) {
                 return new EditorInput<Boolean>(initialValue) {
-                    private final CheckBox checkBox = new CheckBox("", editorSkin);
+                    private final CheckBox checkBox = new CheckBox("off", editorSkin);
 
                     {
                         checkBox.setChecked(initialValue == null ? false : initialValue);
+                        checkBox.setText(checkBox.isChecked() ? "on" : "off");
                         checkBox.addListener(new ChangeListener() {
                             @Override public void changed(ChangeEvent event, Actor actor) {
+                                checkBox.setText(checkBox.isChecked() ? "on" : "off");
                                 dispatcher.setState(checkBox.isChecked());
                             }
                         });

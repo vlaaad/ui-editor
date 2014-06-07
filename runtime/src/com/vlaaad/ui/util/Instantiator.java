@@ -10,17 +10,25 @@ import com.badlogic.gdx.utils.ObjectMap;
 public abstract class Instantiator<T> {
     public final ObjectMap<String, Class> requirements = new ObjectMap<String, Class>();
 
-    JsonValue value;
-    Skin skin;
-    ObjectMap<Object, ObjectMap<String, Object>> params;
+    public JsonValue value;
+    public Skin skin;
+    public ObjectMap<Object, ObjectMap<String, Object>> params;
 
-    protected void require(String key, Class type) {
+    protected Instantiator() {
+        init();
+    }
+    protected void init() {
+
+    }
+
+    protected Instantiator<T> require(String key, Class type) {
         requirements.put(key, type);
+        return this;
     }
 
     public abstract T newInstance(Resources resources);
 
-    protected T instantiate(JsonValue value) {
+    protected <E> E instantiate(JsonValue value) {
         return Toolkit.instantiate(value, skin, params);
     }
 

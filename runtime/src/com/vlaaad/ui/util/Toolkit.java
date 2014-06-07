@@ -16,7 +16,9 @@ import com.esotericsoftware.tablelayout.Value;
 import com.vlaaad.ui.UiAlign;
 import com.vlaaad.ui.scene2d.HorizontalList;
 import com.vlaaad.ui.scene2d.VerticalList;
+import com.vlaaad.ui.util.instantiators.CollectionInstantiator;
 import com.vlaaad.ui.util.instantiators.ReflectionInstantiator;
+import com.vlaaad.ui.util.instantiators.WrapperInstantiator;
 
 /**
  * Created 30.05.14 by vlaaad
@@ -101,11 +103,9 @@ public class Toolkit {
         });
 
         applier("transform", Group.class, Boolean.class, new Applier<Group, Boolean>() {
-
             @Override public Boolean getDefaultValue(Group o, Skin skin) {
                 return !(o instanceof Container || o instanceof Stack || o instanceof Table);
             }
-
             @Override public void apply(Group o, Boolean v) {
                 o.setTransform(v);
             }
@@ -121,7 +121,6 @@ public class Toolkit {
             @Override public void applyDefault(Cell o, Skin skin) {
                 o.minWidth(Value.minWidth);
             }
-
             @Override public void apply(Cell o, Float v) {
                 o.minWidth(v);
             }
@@ -130,7 +129,6 @@ public class Toolkit {
             @Override public void applyDefault(Cell o, Skin skin) {
                 o.minHeight(Value.minHeight);
             }
-
             @Override public void apply(Cell o, Float v) {
                 o.minHeight(v);
             }
@@ -139,7 +137,6 @@ public class Toolkit {
             @Override public void applyDefault(Cell o, Skin skin) {
                 o.prefWidth(Value.prefWidth);
             }
-
             @Override public void apply(Cell o, Float v) {
                 o.prefWidth(v);
             }
@@ -148,7 +145,6 @@ public class Toolkit {
             @Override public void applyDefault(Cell o, Skin skin) {
                 o.prefHeight(Value.prefHeight);
             }
-
             @Override public void apply(Cell o, Float v) {
                 o.prefHeight(v);
             }
@@ -157,7 +153,6 @@ public class Toolkit {
             @Override public void applyDefault(Cell o, Skin skin) {
                 o.maxWidth(Value.maxWidth);
             }
-
             @Override public void apply(Cell o, Float v) {
                 o.maxWidth(v);
             }
@@ -166,7 +161,6 @@ public class Toolkit {
             @Override public void applyDefault(Cell o, Skin skin) {
                 o.maxHeight(Value.maxHeight);
             }
-
             @Override public void apply(Cell o, Float v) {
                 o.maxHeight(v);
             }
@@ -175,7 +169,6 @@ public class Toolkit {
             @Override public void applyDefault(Cell o, Skin skin) {
                 o.spaceTop(Value.zero);
             }
-
             @Override public void apply(Cell o, Float v) {
                 o.spaceTop(v);
             }
@@ -184,7 +177,6 @@ public class Toolkit {
             @Override public void applyDefault(Cell o, Skin skin) {
                 o.spaceRight(Value.zero);
             }
-
             @Override public void apply(Cell o, Float v) {
                 o.spaceLeft(v);
             }
@@ -193,7 +185,6 @@ public class Toolkit {
             @Override public void applyDefault(Cell o, Skin skin) {
                 o.spaceBottom(Value.zero);
             }
-
             @Override public void apply(Cell o, Float v) {
                 o.spaceBottom(v);
             }
@@ -202,7 +193,6 @@ public class Toolkit {
             @Override public void applyDefault(Cell o, Skin skin) {
                 o.spaceRight(Value.zero);
             }
-
             @Override public void apply(Cell o, Float v) {
                 o.spaceRight(v);
             }
@@ -211,7 +201,6 @@ public class Toolkit {
             @Override public void applyDefault(Cell o, Skin skin) {
                 o.padTop(Value.zero);
             }
-
             @Override public void apply(Cell o, Float v) {
                 o.padTop(v);
             }
@@ -220,7 +209,6 @@ public class Toolkit {
             @Override public void applyDefault(Cell o, Skin skin) {
                 o.padLeft(Value.zero);
             }
-
             @Override public void apply(Cell o, Float v) {
                 o.padLeft(v);
             }
@@ -229,7 +217,6 @@ public class Toolkit {
             @Override public void applyDefault(Cell o, Skin skin) {
                 o.padBottom(Value.zero);
             }
-
             @Override public void apply(Cell o, Float v) {
                 o.padBottom(v);
             }
@@ -238,7 +225,6 @@ public class Toolkit {
             @Override public void applyDefault(Cell o, Skin skin) {
                 o.padRight(Value.zero);
             }
-
             @Override public void apply(Cell o, Float v) {
                 o.padRight(v);
             }
@@ -290,10 +276,6 @@ public class Toolkit {
             }
         });
         applier("style", Label.class, Label.LabelStyle.class, new Applier<Label, Label.LabelStyle>() {
-            @Override public Label.LabelStyle getDefaultValue(Label o, Skin skin) {
-                return skin.get(Label.LabelStyle.class);
-            }
-
             @Override public void apply(Label o, Label.LabelStyle v) {
                 o.setStyle(v);
             }
@@ -310,9 +292,6 @@ public class Toolkit {
             }
         });
         applier("style", TextButton.class, TextButton.TextButtonStyle.class, new Applier<TextButton, TextButton.TextButtonStyle>() {
-            @Override public TextButton.TextButtonStyle getDefaultValue(TextButton o, Skin skin) {
-                return skin.get(TextButton.TextButtonStyle.class);
-            }
 
             @Override public void apply(TextButton o, TextButton.TextButtonStyle v) {
                 o.setStyle(v);
@@ -387,9 +366,6 @@ public class Toolkit {
             }
         });
         applier("style", ProgressBar.class, ProgressBar.ProgressBarStyle.class, new Applier<ProgressBar, ProgressBar.ProgressBarStyle>() {
-            @Override public ProgressBar.ProgressBarStyle getDefaultValue(ProgressBar o, Skin skin) {
-                return skin.get(ProgressBar.ProgressBarStyle.class);
-            }
 
             @Override public void apply(ProgressBar o, ProgressBar.ProgressBarStyle v) {
                 o.setStyle(v);
@@ -401,17 +377,7 @@ public class Toolkit {
             }
         });
 
-        applier("style", ScrollPane.class, ScrollPane.ScrollPaneStyle.class, new Applier<ScrollPane, ScrollPane.ScrollPaneStyle>() {
-            @Override public ScrollPane.ScrollPaneStyle getDefaultValue(ScrollPane o, Skin skin) {
-                return skin.get(ScrollPane.ScrollPaneStyle.class);
-            }
-
-            @Override public void apply(ScrollPane o, ScrollPane.ScrollPaneStyle v) {
-                o.setStyle(v);
-            }
-        });
-
-        applier("background", Table.class, Drawable.class, new Applier<Table, Drawable>() {
+        applier("background", Table.class, Drawable.class, null, new Applier<Table, Drawable>() {
             @Override public void apply(Table o, Drawable v) {
                 o.setBackground(v);
             }
@@ -419,6 +385,12 @@ public class Toolkit {
         applier("align", Table.class, UiAlign.class, UiAlign.center, new Applier<Table, UiAlign>() {
             @Override public void apply(Table o, UiAlign v) {
                 o.align(v.value);
+            }
+        });
+
+        applier("style", ScrollPane.class, ScrollPane.ScrollPaneStyle.class, new Applier<ScrollPane, ScrollPane.ScrollPaneStyle>() {
+            @Override public void apply(ScrollPane o, ScrollPane.ScrollPaneStyle v) {
+                o.setStyle(v);
             }
         });
         applier("overScroll", ScrollPane.class, Boolean.class, true, new Applier<ScrollPane, Boolean>() {
@@ -433,75 +405,55 @@ public class Toolkit {
         });
 
         instantiator("label", Label.class, new Instantiator<Label>() {
-            {
-                require("text", String.class);
-                require("style", Label.LabelStyle.class);
+            @Override protected void init() {
+                require("text", String.class).require("style", Label.LabelStyle.class);
             }
-
             @Override public Label newInstance(Resources resources) {
                 return new Label(resources.get("text", String.class), resources.get("style", Label.LabelStyle.class));
             }
         });
+
         instantiator("text-button", TextButton.class, new Instantiator<TextButton>() {
-            {
+            @Override protected void init() {
                 require("style", TextButton.TextButtonStyle.class);
             }
-
             @Override public TextButton newInstance(Resources resources) {
                 return new TextButton(resources.get("text", ""), resources.get("style", TextButton.TextButtonStyle.class));
             }
         });
-        instantiator("container", Container.class, new Instantiator<Container>() {
 
-            @Override public Container newInstance(Resources resources) {
-                return new Container(value.has("widget") ? (Actor) instantiate(value.get("widget")) : null);
+        instantiator("container", Container.class, new WrapperInstantiator<Container, Actor>() {
+            @Override protected Container createInstance(Resources resources, Actor optionalWrapped) {
+                return new Container(optionalWrapped);
             }
         });
 
-        instantiator("vertical-list", VerticalList.class, new Instantiator<VerticalList>() {
-            @Override public VerticalList newInstance(Resources resources) {
-                VerticalList list = new VerticalList(skin);
-                if (!value.has("elements"))
-                    return list;
-                for (JsonValue element : value.get("elements")) {
-                    Actor actor = instantiate(element.get("widget"));
-                    Cell cell = list.add(actor);
-                    inject(cell, element);
-                }
-                return list;
+        instantiator("vertical-list", VerticalList.class, new CollectionInstantiator<VerticalList>() {
+            @Override protected VerticalList createInstance(Resources resources) {
+                return new VerticalList(skin);
+            }
+            @Override protected void addElement(VerticalList o, JsonValue v) {
+                Actor e = v.has("widget") ? this.<Actor>instantiate(v.get("widget")) : null;
+                Cell cell = o.add(e);
+                inject(cell, v);
             }
         });
-        instantiator("horizontal-list", HorizontalList.class, new Instantiator<HorizontalList>() {
-            @Override public HorizontalList newInstance(Resources resources) {
-                HorizontalList list = new HorizontalList(skin);
-                if (!value.has("elements"))
-                    return list;
-                for (JsonValue element : value.get("elements")) {
-                    Actor actor = instantiate(element.get("widget"));
-                    Cell cell = list.add(actor);
-                    inject(cell, element);
-                }
-                return list;
+
+        instantiator("horizontal-list", HorizontalList.class, new CollectionInstantiator<HorizontalList>() {
+            @Override protected HorizontalList createInstance(Resources resources) {
+                return new HorizontalList(skin);
+            }
+            @Override protected void addElement(HorizontalList o, JsonValue v) {
+                Actor actor = v.has("widget") ? this.<Actor>instantiate(v.get("widget")) : null;
+                Cell cell = o.add(actor);
+                inject(cell, v);
             }
         });
-        instantiator("group", Group.class, new Instantiator<Group>() {
-            @Override public Group newInstance(Resources resources) {
-                Group group = new Group();
-                if (!value.has("elements"))
-                    return group;
-                for (JsonValue element : value.get("elements")) {
-                    Actor actor = instantiate(element.get("widget"));
-                    group.addActor(actor);
-                }
-                return group;
-            }
-        });
+
         instantiator("progressBar", ProgressBar.class, new Instantiator<ProgressBar>() {
-
-            {
+            @Override protected void init() {
                 require("style", ProgressBar.ProgressBarStyle.class);
             }
-
             @Override public ProgressBar newInstance(Resources resources) {
                 return new ProgressBar(
                     value.getFloat("min", 0),
@@ -513,9 +465,9 @@ public class Toolkit {
             }
         });
 
-        instantiator("scroll-pane", ScrollPane.class, new Instantiator<ScrollPane>() {
-            @Override public ScrollPane newInstance(Resources resources) {
-                return new ScrollPane(value.has("widget") ? (Actor) instantiate(value.get("widget")) : null);
+        instantiator("scroll-pane", ScrollPane.class, new WrapperInstantiator<ScrollPane, Actor>() {
+            @Override protected ScrollPane createInstance(Resources resources, Actor optionalWrapped) {
+                return new ScrollPane(optionalWrapped);
             }
         });
     }
@@ -656,11 +608,11 @@ public class Toolkit {
     }
 
     public static <A, T> void applier(String key, Class<A> objectType, Class<T> valueType, Applier<A, T> applier) {
-        applier(key, objectType, valueType, null, applier);
+        applier(key, objectType, valueType, null, applier, false);
     }
-
-    public static <A, T> void applier(String key, Class<A> objectType, Class<T> valueType, T defaultValue, Applier<A, T> applier) {
+    private static <A, T> void applier(String key, Class<A> objectType, Class<T> valueType, T defaultValue, Applier<A, T> applier, boolean defaultValueDefined) {
         applier.objectClass = objectType;
+        applier.defaultValueDefined = defaultValueDefined;
         applier.valueClass = valueType;
         applier.defaultValue = defaultValue;
         ObjectMap<String, Applier> m = appliers.get(objectType);
@@ -670,6 +622,10 @@ public class Toolkit {
         }
         if (m.put(key, applier) != null)
             throw new IllegalStateException("Key \"" + key + "\" already registered!");
+    }
+
+    public static <A, T> void applier(String key, Class<A> objectType, Class<T> valueType, T defaultValue, Applier<A, T> applier) {
+        applier(key, objectType, valueType, defaultValue, applier, true);
     }
 
     public static boolean hasInstantiator(Class type) {

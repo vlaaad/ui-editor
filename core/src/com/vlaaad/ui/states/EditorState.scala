@@ -249,13 +249,13 @@ class EditorState(val assets: AssetManager) extends AppState {
     table.columnDefaults(0).width(100).expandX().fillX()
     table.columnDefaults(1).width(100).expandX().fillX()
     Toolkit.getAppliers(model.obj).foreach(v => {
-      val label = new Label(v.key, editorSkin)
+      val label = new Label(v.key, editorSkin, "hint")
       label.setAlignment(Align.right)
-      table.add(label).align(Align.right).padRight(2)
+      table.add(label).align(Align.right).padRight(5)
       val required = model.requirements.contains(v.key)
       val applier = Toolkit.applier(model.obj.getClass, v.key).asInstanceOf[Applier[AnyRef, AnyRef]]
       val initial = if (model.params.containsKey(v.key)) model.params.get(v.key) else applier.getDefaultValue(model.obj, layoutSkin)
-      val input = EditorToolkit.createInput[AnyRef](required, initial.asInstanceOf[AnyRef], v.value.valueClass.asInstanceOf[Class[AnyRef]], layoutSkin, editorSkin)
+      val input = EditorToolkit.createInput[AnyRef](required, initial, v.value.valueClass.asInstanceOf[Class[AnyRef]], layoutSkin, editorSkin)
       initInput(model, v.key, input)
       table.add(input.getActor).padBottom(1).row()
     })
