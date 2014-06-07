@@ -21,11 +21,9 @@
 					"minWidth": 100,
 					"widget": {
 						"type": "text-button",
-						"fillParent": false,
 						"name": "open",
 						"text": "Open",
-						"style": "default",
-						"disabled": false
+						"style": "default"
 					}
 				},
 				{
@@ -51,39 +49,6 @@
 			"name": "content",
 			"elements": [
 				{
-					"fillX": true,
-					"fillY": true,
-					"expandX": true,
-					"expandY": true,
-					"widget": {
-						"type": "container",
-						"name": "workspace",
-						"background": "workspace-background",
-						"fillX": true,
-						"fillY": true
-					}
-				},
-				{
-					"maxWidth": 200,
-					"minWidth": 200,
-					"fillX": true,
-					"fillY": true,
-					"expandY": true,
-					"widget": {
-						"type": "scroll-pane",
-						"overScroll": false,
-						"cancelTouch": false,
-						"width": 200,
-						"name": "tree-pane",
-						"widget": {
-							"type": "container",
-							"name": "tree",
-							"fillX": true,
-							"fillY": true
-						}
-					}
-				},
-				{
 					"minWidth": 200,
 					"fillX": true,
 					"fillY": true,
@@ -93,6 +58,39 @@
 						"align": "top",
 						"name": "params",
 						"fillX": true
+					}
+				},
+				{
+					"fillX": true,
+					"fillY": true,
+					"expandX": true,
+					"expandY": true,
+					"widget": {
+						"type": "container",
+						"name": "workspace",
+						"background": "workspace-background",
+						"clip": true,
+						"fillX": true,
+						"fillY": true
+					}
+				},
+				{
+					"maxWidth": 300,
+					"minWidth": 300,
+					"fillX": true,
+					"fillY": true,
+					"expandY": true,
+					"widget": {
+						"type": "scroll-pane",
+						"overScroll": false,
+						"cancelTouch": false,
+						"name": "tree-pane",
+						"widget": {
+							"type": "container",
+							"name": "tree",
+							"fillX": true,
+							"fillY": true
+						}
 					}
 				}
 			]

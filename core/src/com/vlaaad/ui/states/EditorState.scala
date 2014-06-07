@@ -12,7 +12,7 @@ import java.io.File
 import javax.swing.filechooser.FileFilter
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.{Input, Gdx}
-import com.badlogic.gdx.utils.ObjectMap
+import com.badlogic.gdx.utils.{JsonReader, ObjectMap}
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.vlaaad.ui.view.WorkSpace
 import com.vlaaad.ui.util._
@@ -25,14 +25,13 @@ import scala.Some
 
 /** Created 29.05.14 by vlaaad */
 class EditorState(val assets: AssetManager) extends AppState {
-  var main: Table = _
   var workspaceContainer: Container = _
   var treeContainer: Container = _
   var paramsContainer: Container = _
   var editorSkin: Skin = _
   var layoutSkin: Skin = _
+  var root: Actor = _
   var tree: Tree = _
-  var layout: UiLayout = _
   val workspace: WorkSpace = new WorkSpace()
   val renderer = new ShapeRenderer()
   var model: EditorModel[_] = _
@@ -42,8 +41,6 @@ class EditorState(val assets: AssetManager) extends AppState {
     val layout = assets.get("ui.layout", classOf[UiLayout])
     editorSkin = layout.skin
     stage.addActor(layout.getActor)
-    main = layout.get(classOf[Table])
-    main.debug()
     treeContainer = layout.find[Container]("tree")
     workspaceContainer = layout.get(classOf[Container], "content", "workspace")
     workspaceContainer.setBackground(new TiledDrawable(editorSkin.getRegion("workspace-background")))
@@ -99,10 +96,11 @@ class EditorState(val assets: AssetManager) extends AppState {
   def open(file: FileHandle) = {
     currentFile = file
     val params = new ObjectMap[Object, ObjectMap[String, Object]]()
-    layout = new UiLayout(file, editorSkin, params)
+    val layout = new UiLayout(file, editorSkin, params)
+    root = layout.getActor
     layoutSkin = layout.skin
-    workspace.setWidget(layout.getActor)
-    model = buildModel(layout.getActor, params)
+    workspace.setWidget(root)
+    model = buildModel(root, params)
     tree = new Tree(editorSkin)
     tree.setIconSpacing(1, 1)
     tree.setYSpacing(2)
@@ -199,6 +197,11 @@ class EditorState(val assets: AssetManager) extends AppState {
     val arr = new com.badlogic.gdx.utils.Array[AnyRef]()
     tree.findExpandedObjects(arr)
     val returned = block
+    val dumped = EditorToolkit.dump(model, layoutSkin)
+    val params = new ObjectMap[Object, ObjectMap[String, Object]]()
+    root = Toolkit.instantiate(new JsonReader().parse(dumped), layoutSkin, params)
+    model = buildModel(root, params)
+    workspace.setWidget(root)
     tree.clearChildren()
     tree.add(createNode(model))
     tree.expandAll()
@@ -268,16 +271,16 @@ class EditorState(val assets: AssetManager) extends AppState {
             val default = applier.getDefaultValue(model.obj, layoutSkin)
             if (default != null && default == value) {
               applier.applyDefault(model.obj, layoutSkin)
-              invalidate(layout.getActor)
+              invalidate(root)
               model.params.remove(key)
             } else {
               applier.apply(model.obj, value)
-              invalidate(layout.getActor)
+              invalidate(root)
               model.params.put(key, value)
             }
           case None =>
             applier.applyDefault(model.obj, layoutSkin)
-            invalidate(layout.getActor)
+            invalidate(root)
             model.params.remove(key)
         }
 
