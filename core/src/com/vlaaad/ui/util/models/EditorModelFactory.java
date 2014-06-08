@@ -22,7 +22,13 @@ public abstract class EditorModelFactory<T> {
     }
 
     protected final ObjectMap<String, Object> params(Object o, ObjectMap<Object, ObjectMap<String, Object>> params) {
-        return params.containsKey(o) ? params.get(o) : new ObjectMap<String, Object>();
+        if (params.containsKey(o))
+            return params.get(o);
+        else {
+            ObjectMap<String, Object> p = new ObjectMap<String, Object>();
+            params.put(o, p);
+            return p;
+        }
     }
 
     public abstract EditorModel<T> create(T t, ObjectMap<String, Object> params, ObjectMap<Object, ObjectMap<String, Object>> full);

@@ -68,3 +68,7 @@ project(":desktop") {
 tasks.eclipse.doLast {
     delete ".project"
 }
+
+tasks.withType(ScalaCompile) {
+    scalaCompileOptions.useAnt = false
+}

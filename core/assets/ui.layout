@@ -82,16 +82,36 @@
 					"fillY": true,
 					"expandY": true,
 					"widget": {
-						"type": "scroll-pane",
-						"overScroll": false,
-						"cancelTouch": false,
-						"name": "tree-pane",
-						"widget": {
-							"type": "container",
-							"name": "tree",
-							"fillX": true,
-							"fillY": true
-						}
+						"type": "vertical-list",
+						"elements": [
+							{
+								"fillX": true,
+								"fillY": true,
+								"expandX": true,
+								"expandY": true,
+								"widget": {
+									"type": "scroll-pane",
+									"overScroll": false,
+									"cancelTouch": false,
+									"name": "tree-pane",
+									"widget": {
+										"type": "container",
+										"name": "tree",
+										"fillX": true,
+										"fillY": true
+									}
+								}
+							},
+							{
+								"fillX": true,
+								"minHeight": 30,
+								"widget": {
+									"type": "horizontal-list",
+									"name": "tools",
+									"elements": []
+								}
+							}
+						]
 					}
 				}
 			]

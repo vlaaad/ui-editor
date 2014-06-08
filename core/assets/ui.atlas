@@ -75,7 +75,7 @@ plus
   index: -1
 text-field-background
   rotate: false
-  xy: 260, 273
+  xy: 291, 304
   size: 8, 8
   split: 3, 3, 3, 3
   pad: 0, 0, 0, 0
@@ -84,7 +84,7 @@ text-field-background
   index: -1
 text-field-background-required
   rotate: false
-  xy: 34, 46
+  xy: 260, 273
   size: 8, 8
   split: 3, 3, 3, 3
   pad: 0, 0, 0, 0
@@ -93,18 +93,16 @@ text-field-background-required
   index: -1
 text-field-cursor
   rotate: false
-  xy: 34, 43
+  xy: 34, 41
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 text-field-selection
   rotate: false
-  xy: 291, 304
-  size: 8, 8
-  split: 3, 3, 3, 3
-  pad: 0, 0, 0, 0
-  orig: 8, 8
+  xy: 18, 28
+  size: 10, 10
+  orig: 10, 10
   offset: 0, 0
   index: -1
 tree-background
@@ -118,7 +116,7 @@ tree-background
   index: -1
 tree-over
   rotate: false
-  xy: 44, 49
+  xy: 46, 49
   size: 5, 5
   split: 2, 2, 2, 2
   pad: 0, 0, 0, 0
@@ -141,16 +139,23 @@ ubuntu-light-16
   orig: 256, 256
   offset: 0, 0
   index: -1
-valid-target-background
+ui-window-background
   rotate: false
   xy: 270, 280
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
+valid-target-background
+  rotate: false
+  xy: 291, 301
+  size: 1, 1
+  orig: 1, 1
+  offset: 0, 0
+  index: -1
 workspace-background
   rotate: false
-  xy: 18, 28
+  xy: 34, 44
   size: 10, 10
   orig: 10, 10
   offset: 0, 0

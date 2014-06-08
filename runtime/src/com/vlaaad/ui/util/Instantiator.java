@@ -13,6 +13,7 @@ public abstract class Instantiator<T> {
     public JsonValue value;
     public Skin skin;
     public ObjectMap<Object, ObjectMap<String, Object>> params;
+    public Class<T> objectClass;
 
     protected Instantiator() {
         init();

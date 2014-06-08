@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.Layout;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.tablelayout.Cell;
@@ -339,7 +340,7 @@ public class Toolkit {
                 o.fill(o.getFillX() != 0, v);
             }
         });
-        applier("background", Container.class, Drawable.class, new Applier<Container, Drawable>() {
+        applier("background", Container.class, Drawable.class, null, new Applier<Container, Drawable>() {
             @Override public void apply(Container o, Drawable v) {
                 o.background(v);
             }
@@ -637,11 +638,23 @@ public class Toolkit {
         return instantiators.get(type);
     }
 
+    @SuppressWarnings("unchecked")
+    public static <T> Array<Instantiator<? extends T>> getInstantiators(Class<T> type) {
+        Array<Instantiator<? extends T>> result = new Array<Instantiator<? extends T>>();
+        for (ObjectMap.Entry<Class, Instantiator> entry : instantiators.entries()) {
+            if (type.isAssignableFrom(entry.key)) {
+                result.add(entry.value);
+            }
+        }
+        return result;
+    }
+
     public static String tag(Class type) {
         return tags.findKey(type, true);
     }
 
     public static <T> void instantiator(String tag, Class<T> objectType, Instantiator<T> instantiator) {
+        instantiator.objectClass = objectType;
         instantiators.put(objectType, instantiator);
         tags.put(tag, objectType);
     }

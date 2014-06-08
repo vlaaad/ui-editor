@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.ObjectMap;
  * Created 31.05.14 by vlaaad
  */
 public class Resources {
-    final ObjectMap<String, Object> data = new ObjectMap<String, Object>();
+    public final ObjectMap<String, Object> data = new ObjectMap<String, Object>();
 
     @SuppressWarnings("unchecked")
     public <T> T get(String key) {
