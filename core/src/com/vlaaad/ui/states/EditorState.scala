@@ -272,7 +272,9 @@ class EditorState(val assets: AssetManager) extends AppState {
     t.setTouchable(Touchable.enabled)
     model.obj match {
       case a: Actor =>
-        t.add(model.obj.toString).padRight(2).padLeft(2)
+        val label = new Label(model.obj.toString, editorSkin)
+        label.setName("name")
+        t.add(label).padRight(2).padLeft(2)
         t.add(model.obj.getClass.getSimpleName, "hint")
       case any => t.add(any.getClass.getSimpleName, "hint")
     }
@@ -304,7 +306,7 @@ class EditorState(val assets: AssetManager) extends AppState {
     val table = new Table()
     table.columnDefaults(0).width(100).expandX().fillX()
     table.columnDefaults(1).width(100).expandX().fillX()
-    Toolkit.getAppliers(model.obj).foreach(v => {
+    Toolkit.orderedAppliers(model.obj.getClass).foreach(v => {
       val label = new Label(v.key, editorSkin, "hint")
       label.setAlignment(Align.right)
       table.add(label).align(Align.right).padRight(5)
@@ -402,7 +404,10 @@ class EditorState(val assets: AssetManager) extends AppState {
             invalidate(root)
             model.params.remove(key)
         }
-
+        Option(tree.findNode(model)).map(v => v.getActor.asInstanceOf[Group].findActor("name")).foreach {
+          case l:Label => l.setText(model.obj.toString)
+          case _ =>
+        }
       }
     })
   }

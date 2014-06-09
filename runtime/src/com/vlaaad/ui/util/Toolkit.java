@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.Layout;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ArrayMap;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.tablelayout.Cell;
@@ -28,6 +29,7 @@ public class Toolkit {
     private static final ReflectionInstantiator reflectionInstantiator = new ReflectionInstantiator();
 
     private static final ObjectMap<Class, ObjectMap<String, Applier>> appliers = new ObjectMap<Class, ObjectMap<String, Applier>>();
+    private static final ObjectMap<Class, ArrayMap<String, Applier>> orderedAppliers = new ObjectMap<Class, ArrayMap<String, Applier>>();
     private static final ObjectMap<Class, Instantiator> instantiators = new ObjectMap<Class, Instantiator>();
     private static final ObjectMap<String, Class> tags = new ObjectMap<String, Class>();
 
@@ -495,6 +497,24 @@ public class Toolkit {
         return result;
     }
 
+    public static ArrayMap<String, Applier> orderedAppliers(Class type) {
+        ArrayMap<String, Applier> result = new ArrayMap<String, Applier>();
+        while (type != null) {
+            ArrayMap<String, Applier> typeAppliers = orderedAppliers.get(type);
+            if (typeAppliers != null) {
+                result.putAll(typeAppliers);
+            }
+            for (Class inf : type.getInterfaces()) {
+                ArrayMap<String, Applier> interfaceAppliers = orderedAppliers.get(inf);
+                if (interfaceAppliers != null) {
+                    result.putAll(interfaceAppliers);
+                }
+            }
+            type = type.getSuperclass();
+        }
+        return result;
+    }
+
     static void inject(ObjectMap<Object, ObjectMap<String, Object>> fill, Object o, JsonValue v, Skin s) {
         Class type = o.getClass();
         ObjectMap<String, Object> injected = null;
@@ -621,6 +641,12 @@ public class Toolkit {
             m = new ObjectMap<String, Applier>();
             appliers.put(objectType, m);
         }
+        ArrayMap<String, Applier> o = orderedAppliers.get(objectType);
+        if (o == null) {
+            o = new ArrayMap<String, Applier>();
+            orderedAppliers.put(objectType, o);
+        }
+        o.put(key, applier);
         if (m.put(key, applier) != null)
             throw new IllegalStateException("Key \"" + key + "\" already registered!");
     }
