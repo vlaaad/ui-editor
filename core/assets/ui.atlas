@@ -1,6 +1,6 @@
 
 ui.png
-size: 299,312
+size: 306,312
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
@@ -43,6 +43,15 @@ checkbox-on
   xy: 260, 298
   size: 14, 14
   orig: 14, 14
+  offset: 0, 0
+  index: -1
+delimiter
+  rotate: false
+  xy: 2, 2
+  size: 10, 5
+  split: 4, 4, 0, 5
+  pad: 0, 0, 0, 0
+  orig: 10, 5
   offset: 0, 0
   index: -1
 dragged-target-background
@@ -107,7 +116,7 @@ text-field-selection
   index: -1
 tree-background
   rotate: false
-  xy: 2, 2
+  xy: 46, 49
   size: 5, 5
   split: 2, 2, 2, 2
   pad: 0, 0, 0, 0
@@ -116,7 +125,7 @@ tree-background
   index: -1
 tree-over
   rotate: false
-  xy: 46, 49
+  xy: 260, 266
   size: 5, 5
   split: 2, 2, 2, 2
   pad: 0, 0, 0, 0
@@ -125,7 +134,7 @@ tree-over
   index: -1
 tree-selection
   rotate: false
-  xy: 260, 266
+  xy: 301, 307
   size: 5, 5
   split: 2, 2, 2, 2
   pad: 0, 0, 0, 0

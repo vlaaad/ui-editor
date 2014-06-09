@@ -42,7 +42,7 @@ class Collection(obj: AnyRef, params: ObjectMap[String, AnyRef], val elementType
     writer.pop()
   }
 
-  def accepts(model: EditorModel) = elementType.isInstance(model.obj) && model.obj != obj && !elements.contains(model.asInstanceOf[EditorModel], true)
+  def accepts(model: EditorModel) = elementType.isInstance(model.obj) && model.obj != obj
 
   def remove(model: EditorModel) = elements.removeValue(model, true)
 

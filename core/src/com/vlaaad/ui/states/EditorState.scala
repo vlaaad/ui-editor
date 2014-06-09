@@ -162,19 +162,43 @@ class EditorState(val assets: AssetManager) extends AppState {
         val from = payload.getObject.asInstanceOf[Tree.Node]
         val fromModel = from.getObject.asInstanceOf[EditorModel]
         val parentModel = from.getParent.getObject.asInstanceOf[EditorModel]
+        val targetParentModel = if (parentIdx != -1) Some(node.getParent.getObject.asInstanceOf[EditorModel]) else None
         withRebuildTree {
           parentModel match {
-            case c: Collection => c.remove(fromModel)
+            case c: Collection =>
+              targetParentModel.foreach(v => {
+                if (v == c && c.elements.indexOf(fromModel, true) < parentIdx) {
+                  parentIdx = parentIdx - 1
+                }
+              })
+              c.remove(fromModel)
             case w: Wrapper => w.remove(fromModel)
             case _ =>
           }
-          model match {
-            case c: Collection => c.add(fromModel)
-            case w: Wrapper => w.setWidget(fromModel)
-            case _ =>
+          if (parentIdx != -1) {
+            val targetParentModel = node.getParent.getObject.asInstanceOf[EditorModel]
+            targetParentModel.asInstanceOf[Collection].elements.insert(parentIdx, fromModel)
+          } else {
+            model match {
+              case c: Collection => c.add(fromModel)
+              case w: Wrapper => w.setWidget(fromModel)
+              case _ =>
+            }
           }
         }
       }
+
+
+      override def reset(source: Source, payload: Payload): Unit = {
+        delimiter.remove()
+      }
+
+      var parentIdx = -1
+      val delimiter = new Image(editorSkin, "delimiter") {
+        override def hit(x: Float, y: Float, touchable: Boolean): Actor = null
+      }
+      delimiter.setTouchable(Touchable.disabled)
+      delimiter.setWidth(100)
 
       override def drag(source: Source, payload: Payload, x: Float, y: Float, pointer: Int): Boolean = {
         val from = payload.getObject.asInstanceOf[Tree.Node]
@@ -186,15 +210,41 @@ class EditorState(val assets: AssetManager) extends AppState {
           if (parentModel == null) {
             false
           } else {
+            val targetParent = node.getParent
+            if (targetParent != null) {
+              val targetParentModel = targetParent.getObject.asInstanceOf[EditorModel]
+              targetParentModel match {
+                case c: Collection if c.accepts(fromModel) =>
+                  val target = node.getActor
+                  val part = target.getHeight / 3
+                  if (y < part) {
+                    parentIdx = c.elements.indexOf(model, true) + 1
+                    delimiter.setPosition(target.getX, target.getY - 4)
+                    target.getParent.addActor(delimiter)
+                  } else if (y > target.getHeight - part) {
+                    parentIdx = c.elements.indexOf(model, true)
+                    delimiter.setPosition(target.getX, target.getY + target.getHeight - 2)
+                    target.getParent.addActor(delimiter)
+                  } else {
+                    delimiter.remove()
+                    parentIdx = -1
+                  }
+                case _ =>
+                  delimiter.remove()
+                  parentIdx = -1
+              }
+            }
             model match {
-              case c: Collection => c.accepts(fromModel)
-              case w: Wrapper => w.accepts(fromModel)
-              case _ => false
+              case c: Collection => c.accepts(fromModel) || parentIdx != -1
+              case w: Wrapper => w.accepts(fromModel) || parentIdx != -1
+              case _ => parentIdx != -1
             }
           }
         }
       }
-    })
+    }
+
+    )
   }
 
   def withRebuildTree[R](block: => R): R = {
@@ -218,7 +268,7 @@ class EditorState(val assets: AssetManager) extends AppState {
 
   def createView(model: EditorModel) = {
     val t = new Table(editorSkin)
-    t.defaults().padTop(-5).padBottom(-4)
+    t.defaults().padTop(-5).padBottom(-3)
     t.setTouchable(Touchable.enabled)
     model.obj match {
       case a: Actor =>
@@ -227,7 +277,9 @@ class EditorState(val assets: AssetManager) extends AppState {
       case any => t.add(any.getClass.getSimpleName, "hint")
     }
     val c = new Container(t)
+    c.setTouchable(Touchable.enabled)
     c.minWidth(100)
+    c.fillX()
     c
   }
 
