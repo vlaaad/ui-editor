@@ -21,9 +21,9 @@ object DrawHelper {
     val all, over, selected = Value
   }
 
-  def drawModel(model: EditorModel[_], renderer: ShapeRenderer, tree: Tree) = {
+  def drawModel(model: EditorModel, renderer: ShapeRenderer, tree: Tree) = {
     val stage: Stage = tree.getStage
-    def drawDebug(model: EditorModel[_], mode: DrawMode.Value): Unit = {
+    def drawDebug(model: EditorModel, mode: DrawMode.Value): Unit = {
       val actor = model.obj
       actor match {
         case a: Actor =>
@@ -57,10 +57,10 @@ object DrawHelper {
       }
 
       model match {
-        case w: Wrapper[_, _] =>
+        case w: Wrapper =>
           Option(w.wrapped).foreach(drawDebug(_, mode))
-        case l: Element[_] =>
-        case c: Collection[_, _] =>
+        case l: Element =>
+        case c: Collection =>
           c.elements.foreach(drawDebug(_, mode))
       }
     }

@@ -13,10 +13,13 @@ public abstract class TextInput<T> extends EditorInput<T> {
     private final boolean required;
     private String prev = "";
 
-    protected TextInput(boolean required, T initialValue, Skin editorSkin) {
+    protected TextInput(boolean required, boolean isDefault, T initialValue, Skin editorSkin) {
         super(initialValue);
         this.required = required;
-        textField = new TextField(dispatcher.getState() == null ? "" : String.valueOf(dispatcher.getState()), editorSkin, required ? "required" : "default");
+
+        textField = new TextField(isDefault || dispatcher.getState() == null ? "" : String.valueOf(dispatcher.getState()), editorSkin, required ? "required" : "default");
+        if (isDefault)
+            textField.setMessageText(dispatcher.getState() == null ? "" : String.valueOf(dispatcher.getState()));
 
         textField.setTextFieldListener(new TextField.TextFieldListener() {
             @Override public void keyTyped(TextField textField, char c) {

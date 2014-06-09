@@ -50,8 +50,8 @@ public class EditorToolkit {
 
     static {
         input(Float.class, new EditorInputFactory<Float>() {
-            @Override public EditorInput<Float> create(boolean required, final Float initialValue, Skin layoutSkin, final Skin editorSkin) {
-                return new TextInput<Float>(required, initialValue, editorSkin) {
+            @Override public EditorInput<Float> create(boolean required, boolean isDefault, final Float initialValue, Skin layoutSkin, final Skin editorSkin) {
+                return new TextInput<Float>(required, isDefault, initialValue, editorSkin) {
                     @Override protected Float toValue(String text) {
                         return text.equals("-") ? 0 : Float.valueOf(text);
                     }
@@ -59,8 +59,8 @@ public class EditorToolkit {
             }
         });
         input(Integer.class, new EditorInputFactory<Integer>() {
-            @Override public EditorInput<Integer> create(boolean required, final Integer initialValue, Skin layoutSkin, final Skin editorSkin) {
-                return new TextInput<Integer>(required, initialValue, editorSkin) {
+            @Override public EditorInput<Integer> create(boolean required, boolean isDefault, final Integer initialValue, Skin layoutSkin, final Skin editorSkin) {
+                return new TextInput<Integer>(required, isDefault, initialValue, editorSkin) {
                     @Override protected Integer toValue(String text) {
                         return text.equals("-") ? 0 : Integer.valueOf(text);
                     }
@@ -68,8 +68,8 @@ public class EditorToolkit {
             }
         });
         input(String.class, new EditorInputFactory<String>() {
-            @Override public EditorInput<String> create(boolean required, final String initialValue, Skin layoutSkin, final Skin editorSkin) {
-                return new TextInput<String>(required, initialValue, editorSkin) {
+            @Override public EditorInput<String> create(boolean required, boolean isDefault, final String initialValue, Skin layoutSkin, final Skin editorSkin) {
+                return new TextInput<String>(required, isDefault, initialValue, editorSkin) {
                     @Override protected String toValue(String text) {
                         return text;
                     }
@@ -77,7 +77,7 @@ public class EditorToolkit {
             }
         });
         input(Boolean.class, new EditorInputFactory<Boolean>() {
-            @Override public EditorInput<Boolean> create(boolean required, final Boolean initialValue, Skin layoutSkin, final Skin editorSkin) {
+            @Override public EditorInput<Boolean> create(boolean required, boolean isDefault, final Boolean initialValue, Skin layoutSkin, final Skin editorSkin) {
                 return new EditorInput<Boolean>(initialValue) {
                     private final CheckBox checkBox = new CheckBox("off", editorSkin);
 
@@ -109,13 +109,13 @@ public class EditorToolkit {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> EditorInput<T> createInput(boolean required, T initialValue, Class<T> type, Skin layoutSkin, Skin editorSkin) {
+    public static <T> EditorInput<T> createInput(boolean required, boolean isDefault, T initialValue, Class<T> type, Skin layoutSkin, Skin editorSkin) {
         if (type.isEnum()) {
             return new EnumInput<T>(required, type.getEnumConstants(), initialValue, editorSkin);
         }
         EditorInputFactory<T> factory = inputs.get(type);
         if (factory != null) {
-            return factory.create(required, initialValue, layoutSkin, editorSkin);
+            return factory.create(required, isDefault, initialValue, layoutSkin, editorSkin);
         }
         ObjectMap<String, T> resources = layoutSkin.getAll(type);
         if (resources != null) {
@@ -125,7 +125,7 @@ public class EditorToolkit {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> EditorModel<T> createModel(T t, ObjectMap<Object, ObjectMap<String, Object>> params) {
+    public static EditorModel createModel(Object t, ObjectMap<Object, ObjectMap<String, Object>> params) {
         Class type = t.getClass();
         while (type != null) {
             EditorModelFactory f = factories.get(type);
@@ -138,7 +138,7 @@ public class EditorToolkit {
         throw new IllegalStateException();
     }
 
-    public static String dump(EditorModel<?> model, Skin skin) {
+    public static String dump(EditorModel model, Skin skin) {
         StringWriter stringWriter = new StringWriter();
         JsonWriter jsonWriter = new JsonWriter(stringWriter);
         dump(jsonWriter, model, skin);
@@ -148,7 +148,7 @@ public class EditorToolkit {
         return new JsonReader().parse(stringWriter.toString()).prettyPrint(settings);
     }
 
-    public static void dump(JsonWriter writer, EditorModel<?> model, Skin skin) {
+    public static void dump(JsonWriter writer, EditorModel model, Skin skin) {
         try {
             writer.object();
             String tag = Toolkit.tag(model.obj().getClass());

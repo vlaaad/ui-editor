@@ -9,7 +9,7 @@ import com.vlaaad.ui.util.Element;
 */
 public class ElementFactory<T> extends EditorModelFactory<T> {
 
-    @Override public EditorModel<T> create(T t, ObjectMap<String, Object> params, ObjectMap<Object, ObjectMap<String, Object>> full) {
-        return new Element<T>(t, params);
+    @Override public EditorModel create(T t, ObjectMap<String, Object> params, ObjectMap<Object, ObjectMap<String, Object>> full) {
+        return new Element(t, params);
     }
 }

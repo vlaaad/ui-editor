@@ -35,6 +35,16 @@
 						"text": "Save",
 						"style": "default"
 					}
+				},
+				{
+					"maxHeight": 25,
+					"minWidth": 100,
+					"widget": {
+						"type": "text-button",
+						"name": "new",
+						"text": "New",
+						"style": "default"
+					}
 				}
 			]
 		}

@@ -10,8 +10,8 @@ import com.vlaaad.ui.util.Toolkit;
  */
 public abstract class EditorModelFactory<T> {
     @SuppressWarnings("unchecked")
-    public final EditorModel<T> newInstance(T t, ObjectMap<Object, ObjectMap<String, Object>> params) {
-        EditorModel<T> model = create(t, params(t, params), params);
+    public final EditorModel newInstance(T t, ObjectMap<Object, ObjectMap<String, Object>> params) {
+        EditorModel model = create(t, params(t, params), params);
         Instantiator<T> instantiator = (Instantiator<T>) Toolkit.instantiator(t.getClass());
         if (instantiator != null) {
             for (String requirement : instantiator.requirements.keys()) {
@@ -31,5 +31,5 @@ public abstract class EditorModelFactory<T> {
         }
     }
 
-    public abstract EditorModel<T> create(T t, ObjectMap<String, Object> params, ObjectMap<Object, ObjectMap<String, Object>> full);
+    public abstract EditorModel create(T t, ObjectMap<String, Object> params, ObjectMap<Object, ObjectMap<String, Object>> full);
 }

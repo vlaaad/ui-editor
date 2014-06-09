@@ -416,7 +416,7 @@ public class Toolkit {
 
         instantiator("text-button", TextButton.class, new Instantiator<TextButton>() {
             @Override protected void init() {
-                require("style", TextButton.TextButtonStyle.class);
+                require("style", TextButton.TextButtonStyle.class).require("text", String.class);
             }
             @Override public TextButton newInstance(Resources resources) {
                 return new TextButton(resources.get("text", ""), resources.get("style", TextButton.TextButtonStyle.class));

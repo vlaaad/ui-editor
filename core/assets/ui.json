@@ -1,23 +1,23 @@
 {
     com.badlogic.gdx.graphics.Color: {
-        textDefault: {hex: ccccccff},
-        textActive: {hex: eeeeeeff},
-        textButton: {hex: ccccccff},
-        textDisabled: {hex: 666666ff},
-        textHint: {hex: 777777ff}
+        text-default: {hex: ccccccff},
+        text-active: {hex: eeeeeeff},
+        text-button: {hex: ccccccff},
+        text-disabled: {hex: 666666ff},
+        text-hint: {hex: 777777ff}
     },
     com.badlogic.gdx.graphics.g2d.BitmapFont: {
         default: {file: ubuntu-light-16.fnt}
     },
     com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
-        default: {font: default, fontColor: textDefault},
-        hint: {font: default, fontColor: textHint}
+        default: {font: default, fontColor: text-default},
+        hint: {font: default, fontColor: text-hint}
     },
     com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
         default: {
             font: default,
-            fontColor: textButton,
-            disabledFontColor: textDisabled,
+            fontColor: text-button,
+            disabledFontColor: text-disabled,
             up: button-up,
             over: button-over,
             down: button-down
@@ -35,19 +35,21 @@
     com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle: {
         default: {
             font: default,
-            fontColor: textDefault,
-            focusedFontColor: textActive,
+            fontColor: text-default,
+            focusedFontColor: text-active,
             cursor: text-field-cursor,
             selection: text-field-selection,
-            background: text-field-background
+            background: text-field-background,
+            messageFontColor: text-disabled
         },
         required: {
             font: default,
-            fontColor: textDefault,
-            focusedFontColor: textActive,
+            fontColor: text-default,
+            focusedFontColor: text-active,
             cursor: text-field-cursor,
             selection: text-field-selection,
-            background: text-field-background-required
+            background: text-field-background-required,
+            messageFontColor: text-disabled
         }
     },
     com.badlogic.gdx.scenes.scene2d.ui.CheckBox$CheckBoxStyle: {
@@ -63,15 +65,15 @@
     com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle: {
         default: {
             font: default,
-            fontColorSelected: textActive,
-            fontColorUnselected: textDefault,
+            fontColorSelected: text-active,
+            fontColorUnselected: text-default,
             selection: text-field-selection,
             background: text-field-background
         },
         required: {
             font: default,
-            fontColorSelected: textActive,
-            fontColorUnselected: textDefault,
+            fontColorSelected: text-active,
+            fontColorUnselected: text-default,
             selection: text-field-selection,
             background: text-field-background-required
         }
@@ -79,14 +81,14 @@
     com.badlogic.gdx.scenes.scene2d.ui.SelectBox$SelectBoxStyle: {
         default: {
             font: default,
-            fontColor: textDefault,
+            fontColor: text-default,
             background: text-field-background,
             scrollStyle: default,
             listStyle: default
         },
         required: {
             font: default,
-            fontColor: textDefault,
+            fontColor: text-default,
             background: text-field-background-required,
             scrollStyle: default,
             listStyle: required
@@ -94,7 +96,7 @@
     },
     com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle: {
         default: {
-            titleFont: default, titleFontColor: textActive, stageBackground: ui-window-background, background: button-down
+            titleFont: default, titleFontColor: text-active, stageBackground: ui-window-background, background: button-down
         }
     }
 }

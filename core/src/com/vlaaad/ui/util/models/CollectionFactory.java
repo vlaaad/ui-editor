@@ -17,12 +17,12 @@ public abstract class CollectionFactory<T, E> extends EditorModelFactory<T> {
         this.elementType = elementType;
     }
 
-    @Override public EditorModel<T> create(T t, ObjectMap<String, Object> params, ObjectMap<Object, ObjectMap<String, Object>> full) {
-        Array<EditorModel<E>> arr = new Array<EditorModel<E>>();
+    @Override public EditorModel create(T t, ObjectMap<String, Object> params, ObjectMap<Object, ObjectMap<String, Object>> full) {
+        Array<EditorModel> arr = new Array<EditorModel>();
         for (E element : getElements(t)) {
             arr.add(EditorToolkit.createModel(element, full));
         }
-        return new Collection<T, E>(t, params, elementType, arr);
+        return new Collection(t, params, (Class<Object>) elementType, arr);
     }
 
     protected abstract Iterable<? extends E> getElements(T t);

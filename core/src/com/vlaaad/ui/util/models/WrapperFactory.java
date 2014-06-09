@@ -10,15 +10,15 @@ import com.vlaaad.ui.util.Wrapper;
  */
 public abstract class WrapperFactory<T, That> extends EditorModelFactory<T>{
 
-    private final Class<? extends That> elementType;
+    private final Class<That> elementType;
 
-    protected WrapperFactory(Class<? extends That> elementType) {
+    protected WrapperFactory(Class<That> elementType) {
         this.elementType = elementType;
     }
 
-    @Override public EditorModel<T> create(T t, ObjectMap<String, Object> params, ObjectMap<Object, ObjectMap<String, Object>> full) {
+    @Override public EditorModel create(T t, ObjectMap<String, Object> params, ObjectMap<Object, ObjectMap<String, Object>> full) {
         That wrapped = getWrapped(t);
-        return new Wrapper<T, That>(t, elementType, params, wrapped == null ? null : EditorToolkit.createModel(wrapped, full));
+        return new Wrapper(t, (Class<Object>) elementType, params, wrapped == null ? null : EditorToolkit.createModel(wrapped, full));
     }
 
     protected abstract That getWrapped(T t);

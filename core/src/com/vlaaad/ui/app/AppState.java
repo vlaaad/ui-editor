@@ -3,6 +3,7 @@ package com.vlaaad.ui.app;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 /**
@@ -38,9 +39,12 @@ public abstract class AppState {
     void resize(int w, int h) {
         if (this.w == w && this.h == h)
             return;
+        ResizeListener.ResizeEvent event = Pools.obtain(ResizeListener.ResizeEvent.class).setup(this.w, this.h, w, h);
         this.w = w;
         this.h = h;
         stage.getViewport().update(w, h, true);
+        stage.getRoot().fire(event);
+        Pools.free(event);
     }
 
     void resume() {
