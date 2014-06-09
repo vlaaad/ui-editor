@@ -22,6 +22,7 @@ import scala.Some
 import com.vlaaad.ui.scene2d.HorizontalList
 import com.vlaaad.ui.util.inputs.EditorInput
 import com.vlaaad.ui.util.IStateDispatcher.Listener
+import scala.swing.FileChooser
 
 
 /** Created 29.05.14 by vlaaad */
@@ -45,29 +46,29 @@ class EditorState(val assets: AssetManager) extends AppState {
     editorSkin = layout.skin
     stage.addActor(layout.getActor)
     treeContainer = layout.find[Container]("tree")
-    workspaceContainer = layout.get(classOf[Container], "content", "workspace")
+    workspaceContainer = layout.find[Container]("workspace")
     workspaceContainer.setBackground(new TiledDrawable(editorSkin.getRegion("workspace-background")))
     workspaceContainer.setWidget(workspace)
     paramsContainer = layout.find[Container]("params")
     tools = layout.find[HorizontalList]("tools")
     layout.find[Button]("open").addListener(() => {
-      val chooser = new JFileChooser()
-      chooser.setDialogType(JFileChooser.OPEN_DIALOG)
-      chooser.setMultiSelectionEnabled(false)
-      chooser.setFileSelectionMode(JFileChooser.FILES_ONLY)
-      chooser.setAcceptAllFileFilterUsed(false)
-      chooser.setCurrentDirectory(new File("."))
-      chooser.setFileFilter(new FileFilter {
+      val c = new FileChooser(new File("."))
+      c.multiSelectionEnabled = false
+      c.fileSelectionMode = FileChooser.SelectionMode.FilesOnly
+      c.peer.setAcceptAllFileFilterUsed(false)
+      c.peer.setDialogType(JFileChooser.OPEN_DIALOG)
+      c.fileFilter = new FileFilter {
         override def getDescription: String = "*.layout"
 
         override def accept(f: File): Boolean = f.getName endsWith ".layout"
-      })
-      val result = chooser.showDialog(null, "Open")
-      if (result == JFileChooser.APPROVE_OPTION) {
-        Gdx.app.postRunnable(new Runnable {
-          override def run(): Unit = open(new FileHandle(chooser.getSelectedFile))
-        })
       }
+      new Thread(() => {
+        if (c.showOpenDialog(null) == FileChooser.Result.Approve) {
+          Gdx.app.postRunnable(() => openLayout(new FileHandle(c.selectedFile)))
+        }
+      }).start()
+
+
     })
     layout.find[Button]("save").addListener(() => currentFile.writeString(EditorToolkit.dump(model, layoutSkin), false))
     layout.find[Button]("new").addListener(() => {
@@ -94,10 +95,34 @@ class EditorState(val assets: AssetManager) extends AppState {
     })
   }
 
-  def open(file: FileHandle) = {
+  def openLayout(file: FileHandle) = {
     currentFile = file
     params = new ObjectMap[Object, ObjectMap[String, Object]]()
-    val layout = new UiLayout(file, editorSkin, params)
+    val skinFile = file.sibling(s"${file.nameWithoutExtension}.json")
+    if (skinFile.exists()) {
+      load(file, skinFile)
+    } else {
+      val c = new FileChooser(new File("."))
+      c.multiSelectionEnabled = false
+      c.fileSelectionMode = FileChooser.SelectionMode.FilesOnly
+      c.peer.setAcceptAllFileFilterUsed(false)
+      c.peer.setDialogType(JFileChooser.OPEN_DIALOG)
+      c.fileFilter = new FileFilter {
+        override def getDescription: String = "*.json"
+
+        override def accept(f: File): Boolean = f.getName endsWith ".json"
+      }
+      new Thread(() => {
+        if (c.showOpenDialog(null) == FileChooser.Result.Approve) {
+          Gdx.app.postRunnable(() => load(file, new FileHandle(c.selectedFile)))
+        }
+      }).start()
+    }
+  }
+
+  def load(layoutFile: FileHandle, skinFile: FileHandle) = {
+    Option(layoutSkin).foreach(v => v.dispose())
+    val layout = new UiLayout(layoutFile, new Skin(skinFile), params)
     root = layout.getActor
     layoutSkin = layout.skin
     workspace.setWidget(root)
@@ -404,8 +429,8 @@ class EditorState(val assets: AssetManager) extends AppState {
             invalidate(root)
             model.params.remove(key)
         }
-        Option(tree.findNode(model)).map(v => v.getActor.asInstanceOf[Group].findActor("name")).foreach {
-          case l:Label => l.setText(model.obj.toString)
+        Option(tree.findNode(model)).map(v => v.getActor.asInstanceOf[Group].findActor[Label]("name")).foreach {
+          case label: Label => label.setText(model.obj.toString)
           case _ =>
         }
       }

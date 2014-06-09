@@ -46,6 +46,11 @@ public class EditorToolkit {
                 return scrollPane.getWidget();
             }
         });
+        factory(Container.class, new WrapperFactory<Container, Actor>(Actor.class) {
+            @Override protected Actor getWrapped(Container container) {
+                return container.getWidget();
+            }
+        });
     }
 
     static {

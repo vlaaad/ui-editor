@@ -23,7 +23,10 @@ public class UiLayout {
     private Actor actor;
 
     public UiLayout(FileHandle file) {
-        this(file, new Skin(file.sibling(file.nameWithoutExtension() + ".json")));
+        this(file, file.sibling(file.nameWithoutExtension() + ".json"));
+    }
+    public UiLayout(FileHandle file, FileHandle skinFile) {
+        this(file, new Skin(skinFile));
     }
 
     public UiLayout(FileHandle file, Skin skin) {

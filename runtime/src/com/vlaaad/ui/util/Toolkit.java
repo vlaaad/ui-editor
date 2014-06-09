@@ -61,6 +61,11 @@ public class Toolkit {
                 o.setWidth(v);
             }
         });
+        applier("height", Actor.class, Float.class, 0f, new Applier<Actor, Float>() {
+            @Override public void apply(Actor o, Float v) {
+                o.setHeight(v);
+            }
+        });
         applier("rotation", Actor.class, Float.class, 0f, new Applier<Actor, Float>() {
             @Override public void apply(Actor o, Float v) {
                 o.setRotation(v);
@@ -312,6 +317,36 @@ public class Toolkit {
                 o.align(v.value);
             }
         });
+        applier("minWidth", Container.class, Float.class, 0f, new Applier<Container, Float>() {
+            @Override public void apply(Container o, Float v) {
+                o.minWidth(v);
+            }
+        });
+        applier("minHeight", Container.class, Float.class, 0f, new Applier<Container, Float>() {
+            @Override public void apply(Container o, Float v) {
+                o.minHeight(v);
+            }
+        });
+        applier("prefWidth", Container.class, Float.class, 0f, new Applier<Container, Float>() {
+            @Override public void apply(Container o, Float v) {
+                o.prefWidth(v);
+            }
+        });
+        applier("prefHeight", Container.class, Float.class, 0f, new Applier<Container, Float>() {
+            @Override public void apply(Container o, Float v) {
+                o.prefHeight(v);
+            }
+        });
+        applier("maxWidth", Container.class, Float.class, 0f, new Applier<Container, Float>() {
+            @Override public void apply(Container o, Float v) {
+                o.maxWidth(v);
+            }
+        });
+        applier("maxHeight", Container.class, Float.class, 0f, new Applier<Container, Float>() {
+            @Override public void apply(Container o, Float v) {
+                o.maxHeight(v);
+            }
+        });
         applier("padTop", Container.class, Float.class, new Applier<Container, Float>() {
             @Override public void apply(Container o, Float v) {
                 o.padTop(v);
@@ -453,7 +488,7 @@ public class Toolkit {
             }
         });
 
-        instantiator("progressBar", ProgressBar.class, new Instantiator<ProgressBar>() {
+        instantiator("progress-bar", ProgressBar.class, new Instantiator<ProgressBar>() {
             @Override protected void init() {
                 require("style", ProgressBar.ProgressBarStyle.class);
             }

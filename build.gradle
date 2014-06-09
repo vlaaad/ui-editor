@@ -33,7 +33,7 @@ project(":core") {
 
     dependencies {
         compile project(":runtime")
-        compile "org.scala-lang:scala-library:$scalaVersion"
+        compile "org.scala-lang:scala-library-all:$scalaVersion"
     }
 }
 

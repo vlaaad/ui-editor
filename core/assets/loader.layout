@@ -1,12 +1,11 @@
 {
-    name: loader,
-    type: container,
-    fillParent: true,
-    widget: {
-        type: progressBar,
-        name: progress,
-        width: 200,
-        height: 20,
-        style: default
-    }
+"type": "container",
+"prefWidth": 200,
+"name": "loader",
+"fillParent": true,
+"widget": {
+	"type": "progress-bar",
+	"name": "progress",
+	"style": "default"
+}
 }

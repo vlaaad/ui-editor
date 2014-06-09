@@ -13,7 +13,6 @@
 		"widget": {
 			"type": "horizontal-list",
 			"align": "left",
-			"name": "top-panel",
 			"transform": false,
 			"elements": [
 				{
@@ -56,7 +55,6 @@
 		"expandY": true,
 		"widget": {
 			"type": "horizontal-list",
-			"name": "content",
 			"elements": [
 				{
 					"maxWidth": 250,
@@ -103,7 +101,6 @@
 									"type": "scroll-pane",
 									"overScroll": false,
 									"cancelTouch": false,
-									"name": "tree-pane",
 									"widget": {
 										"type": "container",
 										"name": "tree",
