@@ -1,6 +1,6 @@
 package com.vlaaad.ui.states
 
-import com.vlaaad.ui.app.AppState
+import com.vlaaad.ui.app.{ResizeListener, AppState}
 import com.badlogic.gdx.assets.AssetManager
 import com.vlaaad.ui.UiLayout
 import com.badlogic.gdx.scenes.scene2d.ui._
@@ -73,6 +73,9 @@ class EditorState(val assets: AssetManager) extends AppState {
     layout.find[Button]("save").addListener(() => currentFile.writeString(EditorToolkit.dump(model, layoutSkin), false))
     layout.find[Button]("new").addListener(() => {
       println("new!")
+    })
+    stage.addListener(new ResizeListener {
+      override def resize(): Unit = Option(root).foreach(v => invalidate(v))
     })
     stage.addListener(new InputListener {
 
@@ -369,7 +372,11 @@ class EditorState(val assets: AssetManager) extends AppState {
     def inst(i: Instantiator[AnyRef]) = {
       def make(res: Resources) = {
         try {
+          i.value = new JsonReader().parse("{}")
+          i.skin = editorSkin
           val model = buildModel(i.newInstance(res), params)
+          i.value = null
+          i.skin = null
           res.data.foreach(e => model.params.put(e.key, e.value))
           f(model)
         } catch {
@@ -415,15 +422,14 @@ class EditorState(val assets: AssetManager) extends AppState {
         Option(newState) match {
           case Some(value) =>
             val default = applier.getDefaultValue(model.obj, layoutSkin)
-            if (default != null && default == value) {
-              applier.applyDefault(model.obj, layoutSkin)
-              invalidate(root)
+            val i = Toolkit.instantiator(model.obj.getClass)
+            if (applier.defaultValueDefined && value == default && (i == null || !i.requirements.containsKey(key))) {
               model.params.remove(key)
             } else {
-              applier.apply(model.obj, value)
-              invalidate(root)
               model.params.put(key, value)
             }
+            applier.apply(model.obj, value)
+            invalidate(root)
           case None =>
             applier.applyDefault(model.obj, layoutSkin)
             invalidate(root)

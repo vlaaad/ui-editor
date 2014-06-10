@@ -32,8 +32,8 @@ class CreateWindow(val i: Instantiator[AnyRef], val editorSkin: Skin, val layout
       inputs += r.key -> input.getActor
       row()
     }
-    val ok = new TextButton("Create", layoutSkin)
-    val cancel = new TextButton("Cancel", layoutSkin)
+    val ok = new TextButton("Create", editorSkin)
+    val cancel = new TextButton("Cancel", editorSkin)
     ok.addListener(() => {
       val notFilled = res.filter(_._2 == null).map(v => inputs(v._1))
       if (notFilled.nonEmpty) {

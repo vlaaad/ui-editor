@@ -2,6 +2,7 @@ package com.vlaaad.ui.util;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -49,6 +50,11 @@ public class EditorToolkit {
         factory(Container.class, new WrapperFactory<Container, Actor>(Actor.class) {
             @Override protected Actor getWrapped(Container container) {
                 return container.getWidget();
+            }
+        });
+        factory(Group.class, new CollectionFactory<Group, Actor>(Actor.class) {
+            @Override protected Iterable<? extends Actor> getElements(Group group) {
+                return group.getChildren();
             }
         });
     }

@@ -9,10 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.Layout;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ArrayMap;
-import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.*;
 import com.esotericsoftware.tablelayout.Cell;
 import com.esotericsoftware.tablelayout.Value;
 import com.vlaaad.ui.UiAlign;
@@ -442,12 +439,36 @@ public class Toolkit {
             }
         });
 
+        applier("align", Image.class, UiAlign.class, UiAlign.center, new Applier<Image, UiAlign>() {
+            @Override public void apply(Image o, UiAlign v) {
+                o.setAlign(v.value);
+            }
+        });
+        applier("scaling", Image.class, Scaling.class, Scaling.stretch, new Applier<Image, Scaling>() {
+            @Override public void apply(Image o, Scaling v) {
+                o.setScaling(v);
+            }
+        });
+        applier("drawable", Image.class, Drawable.class, new Applier<Image, Drawable>() {
+            @Override public void apply(Image o, Drawable v) {
+                o.setDrawable(v);
+            }
+        });
+
         instantiator("label", Label.class, new Instantiator<Label>() {
             @Override protected void init() {
                 require("text", String.class).require("style", Label.LabelStyle.class);
             }
             @Override public Label newInstance(Resources resources) {
                 return new Label(resources.get("text", String.class), resources.get("style", Label.LabelStyle.class));
+            }
+        });
+        instantiator("image", Image.class, new Instantiator<Image>() {
+            @Override protected void init() {
+                require("drawable", Drawable.class);
+            }
+            @Override public Image newInstance(Resources resources) {
+                return new Image(resources.get("drawable", Drawable.class));
             }
         });
 
@@ -485,6 +506,14 @@ public class Toolkit {
                 Actor actor = v.has("widget") ? this.<Actor>instantiate(v.get("widget")) : null;
                 Cell cell = o.add(actor);
                 inject(cell, v);
+            }
+        });
+        instantiator("group", Group.class, new CollectionInstantiator<Group>() {
+            @Override protected Group createInstance(Resources resources) {
+                return new Group();
+            }
+            @Override protected void addElement(Group o, JsonValue v) {
+                o.addActor(this.<Actor>instantiate(v));
             }
         });
 
