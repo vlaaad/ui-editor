@@ -5,7 +5,6 @@ import com.badlogic.gdx.assets.AssetManager
 import com.vlaaad.ui.UiLayout
 import com.badlogic.gdx.scenes.scene2d.ui._
 import com.badlogic.gdx.scenes.scene2d.utils._
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent
 import com.badlogic.gdx.scenes.scene2d._
 import javax.swing.JFileChooser
 import java.io.File
@@ -51,6 +50,18 @@ class EditorState(val assets: AssetManager) extends AppState {
     workspaceContainer.setActor(workspace)
     paramsContainer = layout.find[Container[Actor]]("params")
     tools = layout.find[HorizontalList]("tools")
+    tree = new Tree(editorSkin)
+    tree.setIconSpacing(1, 1)
+    tree.setYSpacing(2)
+    tree.getSelection.setMultiple(false)
+    tree.addListener(() => {
+      Option(tree.getSelection.first).map(_.getObject) match {
+        case Some(v: EditorModel) => showParams(v)
+        case Some(v) => hideParams()
+        case None => hideParams()
+      }
+    })
+    treeContainer.setActor(tree)
     layout.find[Button]("open").addListener(() => {
       val c = new FileChooser(new File("."))
       c.multiSelectionEnabled = false
@@ -70,13 +81,47 @@ class EditorState(val assets: AssetManager) extends AppState {
 
 
     })
-    layout.find[Button]("save").addListener(() => currentFile.writeString(EditorToolkit.dump(model, layoutSkin), false))
+    layout.find[Button]("save").addListener(() => {
+      Option(currentFile) match {
+        case Some(f) =>
+          currentFile.writeString(EditorToolkit.dump(model, layoutSkin), false)
+        case None =>
+          val c = new FileChooser(new File("."))
+          c.multiSelectionEnabled = false
+          c.fileSelectionMode = FileChooser.SelectionMode.FilesOnly
+          c.peer.setAcceptAllFileFilterUsed(false)
+          c.peer.setDialogType(JFileChooser.SAVE_DIALOG)
+          c.fileFilter = new FileFilter {
+            override def getDescription: String = "*.layout"
+
+            override def accept(f: File): Boolean = f.getName endsWith ".layout"
+          }
+          new Thread(() => {
+            if (c.showSaveDialog(null) == FileChooser.Result.Approve) {
+              Gdx.app.postRunnable(() => {
+                currentFile = new FileHandle(c.selectedFile)
+                if (currentFile.extension() != "layout")
+                  currentFile = currentFile.sibling(currentFile.nameWithoutExtension + ".layout")
+                currentFile.writeString(EditorToolkit.dump(model, layoutSkin), false)
+              })
+            }
+          }).start()
+      }
+      ()
+    })
     layout.find[Button]("new").addListener(() => {
-      stage.addActor(new CreateLayoutWindow(editorSkin, layoutSkin, EditorState.this, model => {
-        withRebuildTree {
-          this.model = model
-        }
-      }))
+      openSkin(skinFile => {
+        if (root != null) root.remove()
+        currentFile = null
+        if (layoutSkin != null) layoutSkin.dispose()
+        layoutSkin = new Skin(skinFile)
+        params = new ObjectMap[Object, ObjectMap[String, Object]]()
+        stage.addActor(new CreateLayoutWindow(editorSkin, layoutSkin, EditorState.this, model => {
+          withRebuildTree {
+            this.model = model
+          }
+        }))
+      })
     })
     stage.addListener(new ResizeListener {
       override def resize(): Unit = Option(root).foreach(invalidate)
@@ -100,6 +145,52 @@ class EditorState(val assets: AssetManager) extends AppState {
         true
       }
     })
+    stage.addListener(new ClickListener() {
+
+      override def mouseMoved(event: InputEvent, x: Float, y: Float): Boolean = {
+        val r = super.mouseMoved(event, x, y)
+        tree.setOverNode(tree.findNode(findModel(model, event.getTarget)))
+        r
+      }
+
+      override def clicked(event: InputEvent, x: Float, y: Float): Unit = {
+        val m = findModel(model, event.getTarget)
+        Option(m) match {
+          case Some(m) =>
+            val node = tree.findNode(m)
+            Option(node).foreach(v => tree.getSelection.set(node))
+          case None => tree.getSelection.clear()
+        }
+      }
+    })
+  }
+
+  def findModel(model: EditorModel, actor: Actor): Option[EditorModel] = {
+    def findForCurrent(m: EditorModel, a: Actor): Option[EditorModel] = {
+      if (model == null)
+        None
+      else if (model.obj == a)
+        Some(model)
+      else
+        model match {
+          case w: Wrapper => findModel(w.wrapped, a)
+          case c: Collection =>
+            var r: Option[EditorModel] = None
+            c.elements.exists(v => {
+              r = findForCurrent(v, a)
+              r.isDefined
+            })
+            r
+          case _ => None
+        }
+    }
+    var res:Option[EditorModel] = None
+    var cur = actor
+    while (res.isEmpty && cur != null) {
+      res = findForCurrent(model, cur)
+      cur = cur.getParent
+    }
+    res
   }
 
   def openLayout(file: FileHandle) = {
@@ -109,22 +200,26 @@ class EditorState(val assets: AssetManager) extends AppState {
     if (skinFile.exists()) {
       load(file, skinFile)
     } else {
-      val c = new FileChooser(new File("."))
-      c.multiSelectionEnabled = false
-      c.fileSelectionMode = FileChooser.SelectionMode.FilesOnly
-      c.peer.setAcceptAllFileFilterUsed(false)
-      c.peer.setDialogType(JFileChooser.OPEN_DIALOG)
-      c.fileFilter = new FileFilter {
-        override def getDescription: String = "*.json"
-
-        override def accept(f: File): Boolean = f.getName endsWith ".json"
-      }
-      new Thread(() => {
-        if (c.showOpenDialog(null) == FileChooser.Result.Approve) {
-          Gdx.app.postRunnable(() => load(file, new FileHandle(c.selectedFile)))
-        }
-      }).start()
+      openSkin(skinFile => load(file, skinFile))
     }
+  }
+
+  def openSkin(cb: FileHandle => Unit): Unit = {
+    val c = new FileChooser(new File("."))
+    c.multiSelectionEnabled = false
+    c.fileSelectionMode = FileChooser.SelectionMode.FilesOnly
+    c.peer.setAcceptAllFileFilterUsed(false)
+    c.peer.setDialogType(JFileChooser.OPEN_DIALOG)
+    c.fileFilter = new FileFilter {
+      override def getDescription: String = "*.json"
+
+      override def accept(f: File): Boolean = f.getName endsWith ".json"
+    }
+    new Thread(() => {
+      if (c.showOpenDialog(null) == FileChooser.Result.Approve) {
+        Gdx.app.postRunnable(() => cb(new FileHandle(c.selectedFile)))
+      }
+    }).start()
   }
 
   def load(layoutFile: FileHandle, skinFile: FileHandle) = {
@@ -134,22 +229,9 @@ class EditorState(val assets: AssetManager) extends AppState {
     layoutSkin = layout.skin
     workspace.setWidget(root)
     model = buildModel(root, params)
-    tree = new Tree(editorSkin)
-    tree.setIconSpacing(1, 1)
-    tree.setYSpacing(2)
+    tree.clearChildren()
     tree.add(createNode(model))
     tree.expandAll()
-    tree.getSelection.setMultiple(false)
-    tree.addListener(new ChangeListener {
-      override def changed(event: ChangeEvent, actor: Actor): Unit = {
-        Option(tree.getSelection.first).map(_.getObject) match {
-          case Some(v: EditorModel) => showParams(v)
-          case Some(v) => hideParams()
-          case None => hideParams()
-        }
-      }
-    })
-    treeContainer.setActor(tree)
     initDragAndDrop(tree)
   }
 
@@ -280,7 +362,7 @@ class EditorState(val assets: AssetManager) extends AppState {
   }
 
   def withRebuildTree[R](block: => R): R = {
-    val arr = new com.badlogic.gdx.utils.Array[AnyRef]()
+    val arr = new GdxArray[AnyRef]()
     tree.findExpandedObjects(arr)
     val returned = block
     val dumped = EditorToolkit.dump(model, layoutSkin)
@@ -413,7 +495,9 @@ class EditorState(val assets: AssetManager) extends AppState {
       val s = new SelectBox[String](editorSkin)
       val map = instantiators.map(i => i.objectClass.getSimpleName -> i).toMap
       s.setItems(map.keys)
-      s.addListener(() => inst(map(s.getSelected)))
+      s.addListener(() => {
+        inst(map(s.getSelected))
+      })
       s
     }
 

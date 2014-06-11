@@ -651,8 +651,6 @@ public class Toolkit {
             return value.asInt();
         } else if (valueClass == String.class) {
             return value.asString();
-        } else if (valueClass == Color.class) {
-            return Color.valueOf(value.asString());
         } else if (valueClass == Drawable.class) {
             return skin.getDrawable(value.asString());
         } else if (valueClass == TiledDrawable.class) {
@@ -674,6 +672,8 @@ public class Toolkit {
             return instantiate(value, skin);
         } else if (value.has("type") && tags.containsKey(value.getString("type")) && valueClass.isAssignableFrom(tags.get(value.getString("type")))) {
             return instantiate(value, skin);
+        } else if (valueClass == Color.class) {
+            return Color.valueOf(value.asString());
         } else {
             throw new IllegalStateException("can't extract " + valueClass + " from " + value);
         }

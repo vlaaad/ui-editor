@@ -3,7 +3,7 @@ package com.vlaaad.ui.view
 import com.badlogic.gdx.scenes.scene2d.ui.{Skin, Window}
 import com.vlaaad.ui.util.EditorModel
 import com.vlaaad.ui.states._
-import com.badlogic.gdx.scenes.scene2d.{Stage, Group}
+import com.badlogic.gdx.scenes.scene2d.{Actor, Stage}
 import com.vlaaad.ui.app.ResizeListener
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 
@@ -16,7 +16,7 @@ class CreateLayoutWindow(editorSkin: Skin, val layoutSkin: Skin, state: EditorSt
   private def init(): Unit = {
     padTop(20)
     setModal(true)
-    add(state.createInstantiatorActor(classOf[Group].asInstanceOf[Class[AnyRef]], model => {
+    add(state.createInstantiatorActor(classOf[Actor].asInstanceOf[Class[AnyRef]], model => {
       addAction(Actions.sequence(
         Actions.fadeOut(0.5f),
         Actions.removeActor())
