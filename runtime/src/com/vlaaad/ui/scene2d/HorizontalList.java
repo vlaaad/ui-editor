@@ -1,8 +1,8 @@
 package com.vlaaad.ui.scene2d;
 
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.esotericsoftware.tablelayout.Cell;
 
 /**
  * Created 02.06.14 by vlaaad

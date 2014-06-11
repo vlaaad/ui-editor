@@ -10,8 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.Layout;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.*;
-import com.esotericsoftware.tablelayout.Cell;
-import com.esotericsoftware.tablelayout.Value;
 import com.vlaaad.ui.UiAlign;
 import com.vlaaad.ui.scene2d.HorizontalList;
 import com.vlaaad.ui.scene2d.VerticalList;
@@ -314,32 +312,50 @@ public class Toolkit {
                 o.align(v.value);
             }
         });
-        applier("minWidth", Container.class, Float.class, 0f, new Applier<Container, Float>() {
+        applier("minWidth", Container.class, Float.class, new Applier<Container, Float>() {
+            @Override public void applyDefault(Container o, Skin skin) {
+                o.minWidth(Value.minWidth);
+            }
             @Override public void apply(Container o, Float v) {
                 o.minWidth(v);
             }
         });
-        applier("minHeight", Container.class, Float.class, 0f, new Applier<Container, Float>() {
+        applier("minHeight", Container.class, Float.class, new Applier<Container, Float>() {
+            @Override public void applyDefault(Container o, Skin skin) {
+                o.minHeight(Value.minHeight);
+            }
             @Override public void apply(Container o, Float v) {
                 o.minHeight(v);
             }
         });
-        applier("prefWidth", Container.class, Float.class, 0f, new Applier<Container, Float>() {
+        applier("prefWidth", Container.class, Float.class, new Applier<Container, Float>() {
+            @Override public void applyDefault(Container o, Skin skin) {
+                o.prefWidth(Value.prefWidth);
+            }
             @Override public void apply(Container o, Float v) {
                 o.prefWidth(v);
             }
         });
-        applier("prefHeight", Container.class, Float.class, 0f, new Applier<Container, Float>() {
+        applier("prefHeight", Container.class, Float.class, new Applier<Container, Float>() {
+            @Override public void applyDefault(Container o, Skin skin) {
+                o.prefHeight(Value.prefHeight);
+            }
             @Override public void apply(Container o, Float v) {
                 o.prefHeight(v);
             }
         });
-        applier("maxWidth", Container.class, Float.class, 0f, new Applier<Container, Float>() {
+        applier("maxWidth", Container.class, Float.class, new Applier<Container, Float>() {
+            @Override public void applyDefault(Container o, Skin skin) {
+                o.maxWidth(Value.maxWidth);
+            }
             @Override public void apply(Container o, Float v) {
                 o.maxWidth(v);
             }
         });
-        applier("maxHeight", Container.class, Float.class, 0f, new Applier<Container, Float>() {
+        applier("maxHeight", Container.class, Float.class, new Applier<Container, Float>() {
+            @Override public void applyDefault(Container o, Skin skin) {
+                o.maxHeight(Value.maxHeight);
+            }
             @Override public void apply(Container o, Float v) {
                 o.maxHeight(v);
             }
@@ -483,7 +499,7 @@ public class Toolkit {
 
         instantiator("container", Container.class, new WrapperInstantiator<Container, Actor>() {
             @Override protected Container createInstance(Resources resources, Actor optionalWrapped) {
-                return new Container(optionalWrapped);
+                return new Container<Actor>(optionalWrapped);
             }
         });
 

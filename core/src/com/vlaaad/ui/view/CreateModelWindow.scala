@@ -10,7 +10,7 @@ import com.vlaaad.ui.util.IStateDispatcher.Listener
 import com.vlaaad.ui.app.ResizeListener
 
 /** Created 09.06.14 by vlaaad */
-class CreateWindow(val i: Instantiator[AnyRef], val editorSkin: Skin, val layoutSkin: Skin, val cb: Resources => Unit) extends Window(s"Create new ${i.objectClass.getSimpleName}", editorSkin) {
+class CreateModelWindow(val i: Instantiator[AnyRef], val editorSkin: Skin, val layoutSkin: Skin, val cb: Resources => Unit) extends Window(s"Create new ${i.objectClass.getSimpleName}", editorSkin) {
 
   private var listener: ResizeListener = _
 

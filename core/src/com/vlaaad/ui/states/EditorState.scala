@@ -14,7 +14,7 @@ import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.{Input, Gdx}
 import com.badlogic.gdx.utils.{JsonReader, ObjectMap}
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.vlaaad.ui.view.{CreateWindow, WorkSpace}
+import com.vlaaad.ui.view.{CreateLayoutWindow, CreateModelWindow, WorkSpace}
 import com.vlaaad.ui.util._
 import collection.convert.wrapAsScala._
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.{Source, Payload}
@@ -27,9 +27,9 @@ import scala.swing.FileChooser
 
 /** Created 29.05.14 by vlaaad */
 class EditorState(val assets: AssetManager) extends AppState {
-  var workspaceContainer: Container = _
-  var treeContainer: Container = _
-  var paramsContainer: Container = _
+  var workspaceContainer: Container[Actor] = _
+  var treeContainer: Container[Actor] = _
+  var paramsContainer: Container[Actor] = _
   var tools: HorizontalList = _
   var editorSkin: Skin = _
   var layoutSkin: Skin = _
@@ -45,11 +45,11 @@ class EditorState(val assets: AssetManager) extends AppState {
     val layout = assets.get("ui.layout", classOf[UiLayout])
     editorSkin = layout.skin
     stage.addActor(layout.getActor)
-    treeContainer = layout.find[Container]("tree")
-    workspaceContainer = layout.find[Container]("workspace")
+    treeContainer = layout.find[Container[Actor]]("tree")
+    workspaceContainer = layout.find[Container[Actor]]("workspace")
     workspaceContainer.setBackground(new TiledDrawable(editorSkin.getRegion("workspace-background")))
-    workspaceContainer.setWidget(workspace)
-    paramsContainer = layout.find[Container]("params")
+    workspaceContainer.setActor(workspace)
+    paramsContainer = layout.find[Container[Actor]]("params")
     tools = layout.find[HorizontalList]("tools")
     layout.find[Button]("open").addListener(() => {
       val c = new FileChooser(new File("."))
@@ -72,10 +72,14 @@ class EditorState(val assets: AssetManager) extends AppState {
     })
     layout.find[Button]("save").addListener(() => currentFile.writeString(EditorToolkit.dump(model, layoutSkin), false))
     layout.find[Button]("new").addListener(() => {
-      println("new!")
+      stage.addActor(new CreateLayoutWindow(editorSkin, layoutSkin, EditorState.this, model => {
+        withRebuildTree {
+          this.model = model
+        }
+      }))
     })
     stage.addListener(new ResizeListener {
-      override def resize(): Unit = Option(root).foreach(v => invalidate(v))
+      override def resize(): Unit = Option(root).foreach(invalidate)
     })
     stage.addListener(new InputListener {
 
@@ -145,7 +149,7 @@ class EditorState(val assets: AssetManager) extends AppState {
         }
       }
     })
-    treeContainer.setWidget(tree)
+    treeContainer.setActor(tree)
     initDragAndDrop(tree)
   }
 
@@ -349,7 +353,7 @@ class EditorState(val assets: AssetManager) extends AppState {
       initInput(model, v.key, input)
       table.add(input.getActor).padBottom(1).row()
     })
-    paramsContainer.setWidget(table)
+    paramsContainer.setActor(table)
 
     tools.clearChildren()
 
@@ -388,7 +392,7 @@ class EditorState(val assets: AssetManager) extends AppState {
       if (i.requirements.size == 0) {
         make(new Resources)
       } else {
-        stage.addActor(new CreateWindow(i, editorSkin, layoutSkin, r => make(r)))
+        stage.addActor(new CreateModelWindow(i, editorSkin, layoutSkin, r => make(r)))
       }
     }
 
@@ -444,7 +448,7 @@ class EditorState(val assets: AssetManager) extends AppState {
   }
 
   def hideParams(): Unit = {
-    paramsContainer.setWidget(null)
+    paramsContainer.setActor(null)
     tools.clearChildren()
   }
 

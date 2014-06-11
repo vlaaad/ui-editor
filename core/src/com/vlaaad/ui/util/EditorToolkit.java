@@ -10,7 +10,6 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.esotericsoftware.tablelayout.Cell;
 import com.vlaaad.ui.util.inputs.*;
 import com.vlaaad.ui.util.inputs.factories.EditorInputFactory;
 import com.vlaaad.ui.util.models.CollectionFactory;
@@ -34,7 +33,7 @@ public class EditorToolkit {
         factory(TextButton.class, new ElementFactory<TextButton>());
         factory(Cell.class, new WrapperFactory<Cell, Actor>(Actor.class) {
             @Override protected Actor getWrapped(Cell cell) {
-                return (Actor) cell.getWidget();
+                return (Actor) cell.getActor();
             }
         });
         factory(Table.class, new CollectionFactory<Table, Cell>(Cell.class) {
@@ -49,7 +48,7 @@ public class EditorToolkit {
         });
         factory(Container.class, new WrapperFactory<Container, Actor>(Actor.class) {
             @Override protected Actor getWrapped(Container container) {
-                return container.getWidget();
+                return container.getActor();
             }
         });
         factory(Group.class, new CollectionFactory<Group, Actor>(Actor.class) {
