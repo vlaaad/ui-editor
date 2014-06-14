@@ -1,26 +1,27 @@
 package com.vlaaad.ui.states
 
-import com.vlaaad.ui.app.{ResizeListener, AppState}
-import com.badlogic.gdx.assets.AssetManager
-import com.vlaaad.ui.UiLayout
-import com.badlogic.gdx.scenes.scene2d.ui._
-import com.badlogic.gdx.scenes.scene2d.utils._
-import com.badlogic.gdx.scenes.scene2d._
-import javax.swing.JFileChooser
 import java.io.File
+import javax.swing.JFileChooser
 import javax.swing.filechooser.FileFilter
+
+import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.files.FileHandle
-import com.badlogic.gdx.{Input, Gdx}
-import com.badlogic.gdx.utils.{JsonReader, ObjectMap}
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.vlaaad.ui.view.{CreateLayoutWindow, CreateModelWindow, WorkSpace}
-import com.vlaaad.ui.util._
-import collection.convert.wrapAsScala._
-import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.{Source, Payload}
-import scala.Some
+import com.badlogic.gdx.scenes.scene2d._
+import com.badlogic.gdx.scenes.scene2d.ui._
+import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.{Payload, Source}
+import com.badlogic.gdx.scenes.scene2d.utils._
+import com.badlogic.gdx.utils.{JsonReader, ObjectMap}
+import com.badlogic.gdx.{Gdx, Input}
+import com.vlaaad.ui.UiLayout
+import com.vlaaad.ui.app.{AppState, ResizeListener}
 import com.vlaaad.ui.scene2d.HorizontalList
-import com.vlaaad.ui.util.inputs.EditorInput
 import com.vlaaad.ui.util.IStateDispatcher.Listener
+import com.vlaaad.ui.util._
+import com.vlaaad.ui.util.inputs.EditorInput
+import com.vlaaad.ui.view.{CreateLayoutWindow, CreateModelWindow, WorkSpace}
+
+import scala.collection.convert.wrapAsScala._
 import scala.swing.FileChooser
 
 
@@ -148,46 +149,42 @@ class EditorState(val assets: AssetManager) extends AppState {
     stage.addListener(new ClickListener() {
 
       override def mouseMoved(event: InputEvent, x: Float, y: Float): Boolean = {
-        val r = super.mouseMoved(event, x, y)
-        tree.setOverNode(tree.findNode(findModel(model, event.getTarget)))
-        r
+        val a = stage.hit(event.getStageX, event.getStageY, false)
+        a match {
+          case fitting if fitting.isDescendantOf(workspaceContainer) =>
+            findModel(a).foreach(v => tree.setOverNode(tree.findNode(v)))
+          case _ =>
+        }
+        super.mouseMoved(event, x, y)
       }
 
       override def clicked(event: InputEvent, x: Float, y: Float): Unit = {
-        val m = findModel(model, event.getTarget)
-        Option(m) match {
-          case Some(m) =>
-            val node = tree.findNode(m)
-            Option(node).foreach(v => tree.getSelection.set(node))
-          case None => tree.getSelection.clear()
+        val a = stage.hit(event.getStageX, event.getStageY, false)
+        a match {
+          case fitting if fitting.isDescendantOf(workspaceContainer) =>
+            findModel(a).foreach(v => {
+              Option(tree.findNode(v)).foreach(found => tree.getSelection.set(found))
+            })
+          case _ =>
         }
       }
     })
   }
 
-  def findModel(model: EditorModel, actor: Actor): Option[EditorModel] = {
-    def findForCurrent(m: EditorModel, a: Actor): Option[EditorModel] = {
-      if (model == null)
-        None
-      else if (model.obj == a)
-        Some(model)
-      else
-        model match {
-          case w: Wrapper => findModel(w.wrapped, a)
-          case c: Collection =>
-            var r: Option[EditorModel] = None
-            c.elements.exists(v => {
-              r = findForCurrent(v, a)
-              r.isDefined
-            })
-            r
-          case _ => None
-        }
+  def findModel(actor: Actor): Option[EditorModel] = {
+    def findForActor(m: EditorModel, a: Actor): Option[EditorModel] = {
+      m match {
+        case null => None
+        case any if any.obj == a => Some(any)
+        case w: Wrapper => findForActor(w.wrapped, a)
+        case c: Collection => c.elements.map(v => findForActor(v, a)).filter(_.isDefined).map(_.get).headOption
+        case _ => None
+      }
     }
-    var res:Option[EditorModel] = None
+    var res: Option[EditorModel] = None
     var cur = actor
     while (res.isEmpty && cur != null) {
-      res = findForCurrent(model, cur)
+      res = findForActor(model, cur)
       cur = cur.getParent
     }
     res
