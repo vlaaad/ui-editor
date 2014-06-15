@@ -12,9 +12,11 @@ import com.badlogic.gdx.utils.Array;
 public class EnumInput<T> extends EditorInput<T> {
 
     private final SelectBox<String> selectBox;
+    private final T[] enumConstants;
 
     public EnumInput(boolean required, final T[] enumConstants, T initialValue, Skin editorSkin) {
         super(initialValue);
+        this.enumConstants = enumConstants;
         selectBox = new SelectBox<String>(editorSkin, required ? "required" : "default");
         Array<String> items = new Array<String>();
         if (!required) items.add("---");
@@ -28,20 +30,32 @@ public class EnumInput<T> extends EditorInput<T> {
                 if (selectBox.getSelected().equals("---")) {
                     dispatcher.setState(null);
                 } else {
-                    T result = null;
-                    for (T t : enumConstants) {
-                        if (selectBox.getSelected().equals(t.toString())) {
-                            result = t;
-                            break;
-                        }
-                    }
+                    T result = valueOf(selectBox.getSelected());
                     dispatcher.setState(result);
                 }
             }
         });
     }
+    private T valueOf(String o) {
+        for (T t : enumConstants) {
+            if (o.equals(t.toString())) {
+                return t;
+            }
+        }
+        return null;
+    }
 
     @Override public Actor getActor() {
         return selectBox;
+    }
+
+    @Override public void update(Object value) {
+        if (value instanceof String) {
+            T v = valueOf((String) value);
+            if (v != null) {
+                dispatcher.setState(v);
+                selectBox.setSelected(v.toString());
+            }
+        }
     }
 }

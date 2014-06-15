@@ -19,4 +19,8 @@ public class EmptyInput<T> extends EditorInput<T> {
     @Override public Actor getActor() {
         return label;
     }
+
+    @Override public void update(Object value) {
+        label.setText(String.valueOf(value));
+    }
 }

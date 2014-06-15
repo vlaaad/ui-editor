@@ -1,5 +1,4 @@
 todo:
-- visual move-select-resize
 - draw debug lines not in front of everything
-- properly unset fill parent
+- properly unset fill parent (need to apply width/height after unset)
 - l10n

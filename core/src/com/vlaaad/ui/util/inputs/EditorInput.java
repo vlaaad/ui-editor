@@ -16,6 +16,8 @@ public abstract class EditorInput<T> {
 
     public abstract Actor getActor();
 
+    public abstract void update(Object value);
+
     public final IStateDispatcher<T> getDispatcher() {
         return dispatcher;
     }

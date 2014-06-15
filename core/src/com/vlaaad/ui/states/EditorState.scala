@@ -7,6 +7,7 @@ import javax.swing.filechooser.FileFilter
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.math.{MathUtils, Vector2}
 import com.badlogic.gdx.scenes.scene2d._
 import com.badlogic.gdx.scenes.scene2d.ui._
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.{Payload, Source}
@@ -130,8 +131,8 @@ class EditorState(val assets: AssetManager) extends AppState {
     stage.addListener(new InputListener {
 
       override def keyUp(event: InputEvent, keycode: Int): Boolean = {
-        if (keycode == Input.Keys.FORWARD_DEL) {
-          Option(tree).map(_.getSelection.getLastSelected).filter(v => v != null && v.getParent != null).foreach(v => {
+        if (keycode == Input.Keys.FORWARD_DEL && stage.getKeyboardFocus == null) {
+          Option(tree).map(_.getSelection.first()).filter(v => v != null && v.getParent != null).foreach(v => {
             val parent = v.getParent.getObject.asInstanceOf[EditorModel]
             val model = v.getObject.asInstanceOf[EditorModel]
             withRebuildTree {
@@ -146,19 +147,82 @@ class EditorState(val assets: AssetManager) extends AppState {
         true
       }
     })
-    stage.addListener(new ClickListener() {
+    stage.addListener(new DragListener() {
+      setTapSquareSize(1f)
+      val initial = new Vector2()
+      val current = new Vector2()
+      val delta = new Vector2()
+      var m: Option[EditorModel] = None
+      var left = false
+      var right = false
+      var top = false
+      var bottom = false
 
+      override def dragStart(event: InputEvent, x: Float, y: Float, pointer: Int): Unit = {
+        val a = stage.hit(event.getStageX, event.getStageY, false)
+        m = a match {
+          case f if f.isDescendantOf(workspace) =>
+            findModel(f)
+          case _ => None
+        }
+        m match {
+          case None => cancel()
+          case Some(v) =>
+            showParams(v)
+            val target = v.obj.asInstanceOf[Actor]
+            target.stageToLocalCoordinates(initial.set(event.getStageX, event.getStageY))
+            left = initial.x < Math.min(target.getWidth / 4, 20)
+            right = initial.x > Math.max(target.getWidth * 3 / 4, target.getWidth - 20)
+            bottom = initial.y < Math.min(target.getHeight / 4, 20)
+            top = initial.y > Math.max(target.getHeight * 3 / 4, target.getHeight - 20)
+            target.getParent.stageToLocalCoordinates(initial.set(event.getStageX, event.getStageY))
+        }
+      }
+
+      override def drag(event: InputEvent, x: Float, y: Float, pointer: Int): Unit = {
+        val target = m.get.obj.asInstanceOf[Actor]
+        target.getParent.stageToLocalCoordinates(current.set(event.getStageX, event.getStageY))
+        delta.set(current).sub(initial)
+        val isCorner = (top || bottom) && (left || right)
+
+        if (left || right) {
+          target.sizeBy(MathUtils.round(if (left) -delta.x else delta.x), 0)
+          inputMap("width").update(target.getWidth.asInstanceOf[AnyRef])
+        }
+        if (top || bottom) {
+          target.sizeBy(0, MathUtils.round(if (bottom) -delta.y else delta.y))
+          inputMap("height").update(target.getHeight.asInstanceOf[AnyRef])
+        }
+        if (!top && !bottom || isCorner) {
+
+          target.moveBy(MathUtils.round(if (right) 0 else delta.x), 0)
+          inputMap("x").update(target.getX.asInstanceOf[AnyRef])
+        }
+        if (!left && !right || isCorner) {
+          target.moveBy(0, MathUtils.round(if (top) 0 else delta.y))
+          inputMap("y").update(target.getY.asInstanceOf[AnyRef])
+        }
+
+        invalidate(root)
+        initial.set(current)
+      }
+
+      override def dragStop(event: InputEvent, x: Float, y: Float, pointer: Int): Unit = super.dragStop(event, x, y, pointer)
+    })
+    stage.addListener(new InputListener() {
       override def mouseMoved(event: InputEvent, x: Float, y: Float): Boolean = {
         val a = stage.hit(event.getStageX, event.getStageY, false)
         a match {
+          case null =>
           case fitting if fitting.isDescendantOf(workspaceContainer) =>
             findModel(a).foreach(v => tree.setOverNode(tree.findNode(v)))
           case _ =>
         }
-        super.mouseMoved(event, x, y)
+        true
       }
-
-      override def clicked(event: InputEvent, x: Float, y: Float): Unit = {
+    })
+    stage.addListener(new ActorGestureListener() {
+      override def tap(event: InputEvent, x: Float, y: Float, count: Int, button: Int): Unit = {
         val a = stage.hit(event.getStageX, event.getStageY, false)
         a match {
           case fitting if fitting.isDescendantOf(workspaceContainer) =>
@@ -413,10 +477,13 @@ class EditorState(val assets: AssetManager) extends AppState {
     node
   }
 
+  val inputMap = collection.mutable.Map[String, EditorInput[_]]()
+
   def showParams(model: EditorModel): Unit = {
     val table = new Table()
     table.columnDefaults(0).width(100).expandX().fillX()
     table.columnDefaults(1).width(100).expandX().fillX()
+    inputMap.clear()
     Toolkit.orderedAppliers(model.obj.getClass).foreach(v => {
       val label = new Label(v.key, editorSkin, "hint")
       label.setAlignment(Align.right)
@@ -430,6 +497,7 @@ class EditorState(val assets: AssetManager) extends AppState {
 
       val input = EditorToolkit.createInput[AnyRef](required, isDefault, initial, v.value.valueClass.asInstanceOf[Class[AnyRef]], layoutSkin, editorSkin)
       initInput(model, v.key, input)
+      inputMap += v.key -> input
       table.add(input.getActor).padBottom(1).row()
     })
     paramsContainer.setActor(table)

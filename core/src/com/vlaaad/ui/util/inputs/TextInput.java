@@ -37,6 +37,14 @@ public abstract class TextInput<T> extends EditorInput<T> {
         });
     }
 
+    @Override public void update(Object value) {
+        String s = String.valueOf(value);
+        if (acceptInput(s)) {
+            textField.setText(s);
+            dispatcher.setState(toValue(s));
+        }
+
+    }
     protected boolean acceptInput(String currentText) {
         if (required && currentText.length() == 0)
             return false;

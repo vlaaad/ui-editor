@@ -12,9 +12,11 @@ import com.badlogic.gdx.utils.ObjectMap;
  */
 public class SkinInput<T> extends EditorInput<T> {
     private final SelectBox<String> selectBox;
+    private final ObjectMap<String, T> resources;
 
     public SkinInput(boolean required, final ObjectMap<String, T> resources, T initialValue, Skin editorSkin) {
         super(initialValue);
+        this.resources = resources;
         selectBox = new SelectBox<String>(editorSkin, required ? "required" : "default");
         Array<String> items = new Array<String>();
         if (!required) items.add("---");
@@ -38,5 +40,13 @@ public class SkinInput<T> extends EditorInput<T> {
 
     @Override public Actor getActor() {
         return selectBox;
+    }
+
+    @Override public void update(Object value) {
+        String v = String.valueOf(value);
+        T t = resources.get(v);
+        if (t != null) {
+            selectBox.setSelected(v);
+        }
     }
 }

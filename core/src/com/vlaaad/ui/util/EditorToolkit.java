@@ -105,6 +105,12 @@ public class EditorToolkit {
                     @Override public Actor getActor() {
                         return checkBox;
                     }
+
+                    @Override public void update(Object value) {
+                        if (value instanceof Boolean) {
+                            checkBox.setChecked(((Boolean) value));
+                        }
+                    }
                 };
             }
         });
