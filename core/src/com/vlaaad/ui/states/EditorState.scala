@@ -67,13 +67,13 @@ class EditorState(val assets: AssetManager) extends AppState {
     layout.find[Button]("open").addListener(() => {
       val c = new FileChooser(new File("."))
       c.multiSelectionEnabled = false
-      c.fileSelectionMode = FileChooser.SelectionMode.FilesOnly
+//      c.fileSelectionMode = FileChooser.SelectionMode.FilesAndDirectories
       c.peer.setAcceptAllFileFilterUsed(false)
       c.peer.setDialogType(JFileChooser.OPEN_DIALOG)
       c.fileFilter = new FileFilter {
         override def getDescription: String = "*.layout"
 
-        override def accept(f: File): Boolean = f.getName endsWith ".layout"
+        override def accept(f: File): Boolean = f.getName.endsWith(".layout") || f.isDirectory
       }
       new Thread(() => {
         if (c.showOpenDialog(null) == FileChooser.Result.Approve) {
@@ -90,13 +90,13 @@ class EditorState(val assets: AssetManager) extends AppState {
         case None =>
           val c = new FileChooser(new File("."))
           c.multiSelectionEnabled = false
-          c.fileSelectionMode = FileChooser.SelectionMode.FilesOnly
+//          c.fileSelectionMode = FileChooser.SelectionMode.FilesAndDirectories
           c.peer.setAcceptAllFileFilterUsed(false)
           c.peer.setDialogType(JFileChooser.SAVE_DIALOG)
           c.fileFilter = new FileFilter {
             override def getDescription: String = "*.layout"
 
-            override def accept(f: File): Boolean = f.getName endsWith ".layout"
+            override def accept(f: File): Boolean = f.isDirectory || f.getName.endsWith(".layout")
           }
           new Thread(() => {
             if (c.showSaveDialog(null) == FileChooser.Result.Approve) {
@@ -268,13 +268,13 @@ class EditorState(val assets: AssetManager) extends AppState {
   def openSkin(cb: FileHandle => Unit): Unit = {
     val c = new FileChooser(new File("."))
     c.multiSelectionEnabled = false
-    c.fileSelectionMode = FileChooser.SelectionMode.FilesOnly
+//    c.fileSelectionMode = FileChooser.SelectionMode.FilesAndDirectories
     c.peer.setAcceptAllFileFilterUsed(false)
     c.peer.setDialogType(JFileChooser.OPEN_DIALOG)
     c.fileFilter = new FileFilter {
       override def getDescription: String = "*.json"
 
-      override def accept(f: File): Boolean = f.getName endsWith ".json"
+      override def accept(f: File): Boolean = f.isDirectory || f.getName.endsWith(".json")
     }
     new Thread(() => {
       if (c.showOpenDialog(null) == FileChooser.Result.Approve) {
