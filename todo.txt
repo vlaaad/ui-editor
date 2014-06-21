@@ -1,5 +1,4 @@
 todo:
-- failing on save ninepatch as table background 
 - failing on loading skins with custom classes
 - ctrl+z & ctrl+shift+z/ctrl+y
 - draw debug lines not in front of everything

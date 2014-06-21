@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
@@ -194,6 +195,15 @@ public class EditorToolkit {
         String skinElement = skin.find(o);
         if (skinElement != null)
             return skinElement;
+        String name = skin.find(o);
+        if (name != null)
+            return name;
+        if (o instanceof Drawable) {
+            for (ObjectMap.Entry<String, Drawable> entry : skin.getAll(Drawable.class)) {
+                if (entry.value == o)
+                    return entry.key;
+            }
+        }
         if (o instanceof TextureRegionDrawable) {
             TextureRegion region = ((TextureRegionDrawable) o).getRegion();
             for (ObjectMap.Entry<String, TextureRegion> entry : skin.getAll(TextureRegion.class)) {
