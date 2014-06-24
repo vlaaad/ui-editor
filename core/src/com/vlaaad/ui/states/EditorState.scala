@@ -6,6 +6,7 @@ import javax.swing.filechooser.FileFilter
 
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.files.FileHandle
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.{MathUtils, Vector2}
 import com.badlogic.gdx.scenes.scene2d._
@@ -37,7 +38,12 @@ class EditorState(val assets: AssetManager) extends AppState {
   var root: Actor = _
   var tree: Tree = _
   var params: ObjectMap[Object, ObjectMap[String, Object]] = _
-  val workspace: WorkSpace = new WorkSpace()
+  val workspace: WorkSpace = new WorkSpace() {
+    override def draw(batch: Batch, parentAlpha: Float): Unit = {
+      super.draw(batch, parentAlpha)
+
+    }
+  }
   val renderer = new ShapeRenderer()
   var model: EditorModel = _
   var currentFile: FileHandle = _
@@ -273,7 +279,6 @@ class EditorState(val assets: AssetManager) extends AppState {
     c.peer.setDialogType(JFileChooser.OPEN_DIALOG)
     c.fileFilter = new FileFilter {
       override def getDescription: String = "*.json"
-
       override def accept(f: File): Boolean = f.isDirectory || f.getName.endsWith(".json")
     }
     new Thread(() => {
@@ -285,15 +290,19 @@ class EditorState(val assets: AssetManager) extends AppState {
 
   def load(layoutFile: FileHandle, skinFile: FileHandle) = {
     Option(layoutSkin).foreach(v => v.dispose())
-    val layout = new UiLayout(layoutFile, new Skin(skinFile), params)
-    root = layout.getActor
-    layoutSkin = layout.skin
-    workspace.setWidget(root)
-    model = buildModel(root, params)
-    tree.clearChildren()
-    tree.add(createNode(model))
-    tree.expandAll()
-    initDragAndDrop(tree)
+    try {
+      val layout = new UiLayout(layoutFile, new Skin(skinFile), params)
+      root = layout.getActor
+      layoutSkin = layout.skin
+      workspace.setWidget(root)
+      model = buildModel(root, params)
+      tree.clearChildren()
+      tree.add(createNode(model))
+      tree.expandAll()
+      initDragAndDrop(tree)
+    } catch {
+      case e: Throwable => println(s"failed to load layout because of $e")
+    }
   }
 
   def initDragAndDrop(tree: Tree): Unit = {
@@ -481,8 +490,8 @@ class EditorState(val assets: AssetManager) extends AppState {
 
   def showParams(model: EditorModel): Unit = {
     val table = new Table()
-    table.columnDefaults(0).width(100).expandX().fillX()
-    table.columnDefaults(1).width(100).expandX().fillX()
+    table.columnDefaults(0).width(75).expandX().fillX()
+    table.columnDefaults(1).width(150).expandX().fillX()
     inputMap.clear()
     Toolkit.orderedAppliers(model.obj.getClass).foreach(v => {
       val label = new Label(v.key, editorSkin, "hint")

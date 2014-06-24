@@ -134,8 +134,16 @@ public class EditorToolkit {
         if (factory != null) {
             return factory.create(required, isDefault, initialValue, layoutSkin, editorSkin);
         }
+
         ObjectMap<String, T> resources = layoutSkin.getAll(type);
+//        for(Object r : layoutSkin.)
         if (resources != null) {
+            if (type == Drawable.class) {
+                for (ObjectMap.Entry<String, TextureRegion> t : layoutSkin.getAll(TextureRegion.class)) {
+                    if (!resources.containsKey(t.key))
+                        resources.put(t.key, (T) layoutSkin.getDrawable(t.key));
+                }
+            }
             return new SkinInput<T>(required, resources, initialValue, editorSkin);
         }
         return new EmptyInput<T>(initialValue, editorSkin);

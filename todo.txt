@@ -1,7 +1,5 @@
 todo:
-- crash on setting table background to null
-- background has no nine patch drawables
-- crash on loading skins with custom classes
+# - crash on setting table background to null ! raise issue on libgdx 
 - ctrl+z & ctrl+shift+z/ctrl+y
 - draw debug lines not in front of everything
 - properly unset fill parent (need to apply width/height after unset)
