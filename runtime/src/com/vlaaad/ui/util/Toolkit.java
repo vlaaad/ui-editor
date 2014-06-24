@@ -429,6 +429,10 @@ public class Toolkit {
         });
 
         applier("background", Table.class, Drawable.class, null, new Applier<Table, Drawable>() {
+            @Override public void applyDefault(Table o, Skin skin) {
+                o.setBackground(null, false);
+                o.pad(Value.zero);
+            }
             @Override public void apply(Table o, Drawable v) {
                 o.setBackground(v);
             }
