@@ -67,7 +67,7 @@ class EditorState(val assets: AssetManager) extends AppState {
     layout.find[Button]("open").addListener(() => {
       val c = new FileChooser(new File("."))
       c.multiSelectionEnabled = false
-//      c.fileSelectionMode = FileChooser.SelectionMode.FilesAndDirectories
+      //      c.fileSelectionMode = FileChooser.SelectionMode.FilesAndDirectories
       c.peer.setAcceptAllFileFilterUsed(false)
       c.peer.setDialogType(JFileChooser.OPEN_DIALOG)
       c.fileFilter = new FileFilter {
@@ -90,7 +90,7 @@ class EditorState(val assets: AssetManager) extends AppState {
         case None =>
           val c = new FileChooser(new File("."))
           c.multiSelectionEnabled = false
-//          c.fileSelectionMode = FileChooser.SelectionMode.FilesAndDirectories
+          //          c.fileSelectionMode = FileChooser.SelectionMode.FilesAndDirectories
           c.peer.setAcceptAllFileFilterUsed(false)
           c.peer.setDialogType(JFileChooser.SAVE_DIALOG)
           c.fileFilter = new FileFilter {
@@ -268,7 +268,7 @@ class EditorState(val assets: AssetManager) extends AppState {
   def openSkin(cb: FileHandle => Unit): Unit = {
     val c = new FileChooser(new File("."))
     c.multiSelectionEnabled = false
-//    c.fileSelectionMode = FileChooser.SelectionMode.FilesAndDirectories
+    //    c.fileSelectionMode = FileChooser.SelectionMode.FilesAndDirectories
     c.peer.setAcceptAllFileFilterUsed(false)
     c.peer.setDialogType(JFileChooser.OPEN_DIALOG)
     c.fileFilter = new FileFilter {

@@ -35,6 +35,18 @@ project(":core") {
         compile project(":runtime")
         compile "org.scala-lang:scala-library-all:$scalaVersion"
     }
+
+    compileScala {
+        scalaCompileOptions.useCompileDaemon = true
+    }
+
+    tasks.withType(ScalaCompile) {
+        scalaCompileOptions.useAnt = false
+        configure(scalaCompileOptions.forkOptions) {
+            memoryMaximumSize = '1g'
+            jvmArgs = ['-XX:MaxPermSize=512m']
+        }
+    }
 }
 
 project(":runtime") {
@@ -67,8 +79,4 @@ project(":desktop") {
 
 tasks.eclipse.doLast {
     delete ".project"
-}
-
-tasks.withType(ScalaCompile) {
-    scalaCompileOptions.useAnt = false
 }
