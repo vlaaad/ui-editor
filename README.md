@@ -10,11 +10,11 @@ Documentation coming not very soon. You can mail me if you want to contribute or
 There are some issues described in `todo.txt`. 
 
 To run app:
-
-    ./gradlew desktop:run
-    
+```sh
+$ ./gradlew desktop:run
+```    
 To compile library to load layouts in your app:
-
-    ./gradlew runtime:dist
-
+```
+$ ./gradlew runtime:dist
+```
 ### License (for now): WTFPL
