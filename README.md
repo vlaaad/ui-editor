@@ -14,7 +14,7 @@ To run app:
 $ ./gradlew desktop:run
 ```    
 To compile library to load layouts in your app:
-```
+```sh
 $ ./gradlew runtime:dist
 ```
 ### License (for now): WTFPL
